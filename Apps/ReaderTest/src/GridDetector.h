@@ -56,17 +56,17 @@ public:
     int getMaxMarkers(){return mMaxMarkers;}
 
     void setupGridJsonPos(std::string filePos);
-    void generateGridPos();
+    void generateGridPos(int startGridX = 100, int startGridY= 100, int stepX= 50, int stepY= 50);
     void setupBlocks();
 
     void generateMarkers(std::vector<int> & ids, std::vector<QRBlockRef> & blocks, bool sort = false );
-    void clasification();
+
     void updateBlockTypes();
 
     void drawMarkers( );
 
     //update grid positions
-    void toogleDebugGrid(){mDebugGrid =!mDebugGrid;}
+    void enableDebugGrid(bool toggle = true) { mDebugGrid = toggle; }
     void toogleUpdateGrid(){mUpdateGrid = !mUpdateGrid;}
 
     void gridPosIdInc();
@@ -90,7 +90,6 @@ public:
     //draw detected grid
     void drawDetectedGrid(float posx, float posy, float size = 20, float space = 5);
     void drawDetectedGridIn(float posx, float posy, float size = 20, float space = 5);
-    void drawDetectedBlock(float posx, float posy, float size = 20, float space = 5);
 
     void drawBlock(float posx, float posy, float size = 20, float space = 5);
 

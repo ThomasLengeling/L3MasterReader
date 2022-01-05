@@ -88,6 +88,7 @@ public:
     glm::vec2 getCropUp(){return mCornerUp;}
     glm::vec2 getCropDown(){return mCornerDown;}
     glm::vec2 getCropDisp(){return mDisp;}
+    cv::Rect getROI() { return mRoi; }
 
     void setId(int id){mId = id;}
 
@@ -111,7 +112,6 @@ private:
     ofPixels            mPixs;
 
     glm::vec2           mDim;
-    glm::vec2           mLength;
 
     //Resolution of the I
     ofFbo               mFboResolution;
@@ -135,6 +135,7 @@ private:
     glm::vec2 mCornerUp;
     glm::vec2 mCornerDown;
     glm::vec2 mDisp;
+
 
     //corners
     cv::Point2f mInputQuad[4];

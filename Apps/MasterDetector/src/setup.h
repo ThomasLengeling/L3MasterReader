@@ -279,7 +279,7 @@ void ofApp::setupGUI() {
 //-----------------------------------------------------------------------------
 void ofApp::setupDetection() {
   for (int i = 0; i < mNumInputs; i++) {
-    QRDetectorRef detector = QRDetector::create(10, 20);
+    QRDetectorRef detector = QRDetector::create();
     detector->setupCalibration(mGridSizes.at(i).x, mGridSizes.at(i).y);
     mArucoDetector.push_back(detector);
   }

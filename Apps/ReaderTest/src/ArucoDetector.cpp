@@ -6,7 +6,7 @@ using namespace cv;
 ArucoDetector::ArucoDetector() {
   mMinFoundId = 100;
   mMaxFoundId = 0;
-  mMarkerInfo = false;
+  mMarkerInfo = true;
 }
 
 void ArucoDetector::resetMinMax() {

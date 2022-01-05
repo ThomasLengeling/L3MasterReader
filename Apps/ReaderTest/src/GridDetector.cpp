@@ -40,25 +40,21 @@ void GridDetector::setupBlocks() {
   ofLog(OF_LOG_NOTICE) << "setup blocks ";
 }
 
-void GridDetector::generateGridPos() {
+
+//-----------------------------------------------------------------------------
+// Generate grid positions 
+void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, int stepY) {
   mMarkers.clear();
-  float startGridX = 1920 * 0.1;
-  float startGridY = 1080 * 0.1;
-
-  float stepX = 50.0;
-  float stepY = 50.0;
-
-  float gapX = 13;
-  float gapY = 13;
 
   int indeY = 0;
   int indeX = 0;
   ofLog(OF_LOG_NOTICE) << "Max Markers: " << mMaxMarkers;
+
   for (int i = 0; i < mMaxMarkers; i++) {
       TangibleMarkerRef m = TangibleMarker::create();
 
-    float x = indeX * stepX + indeX * gapX + startGridX;
-    float y = indeY * stepY + indeY * gapY + startGridY;
+    float x = indeX * stepX + startGridX;
+    float y = indeY * stepY + startGridY;
 
     m->setPos(glm::vec2(x, y));
     m->setGridId(i);

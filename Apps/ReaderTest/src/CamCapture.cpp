@@ -13,7 +13,6 @@ CamCapture::~CamCapture(){
 //----------------------------------------------------------------------------
 CamCapture::CamCapture(glm::vec2 dims) {
   mDim = dims;
-  mLength = glm::vec2(0, 0);
   mGamma = 0.65;
   mActivateCrop = false;
   mActivateCam = true;
@@ -172,25 +171,22 @@ void CamCapture::resetCrop() {
 //-----------------------------------------------------------------------------
 void CamCapture::cropImg(cv::Mat &inputVideo) {
 
-  mLength.x = mCornerDown.x - mCornerUp.x;
-  mLength.y = mCornerDown.y - mCornerUp.y;
-  mRoi.x = mCornerUp.x;
-  mRoi.y = mCornerUp.y;
-  mRoi.width = mLength.x + mDisp.x;
-  mRoi.height = mLength.y + mDisp.y;
+  mRoi.x = abs(mCornerUp.x);
+  mRoi.y = abs(mCornerUp.y);
+  mRoi.width = abs(mCornerDown.x - mCornerUp.x);//  mLength.x;// +mDisp.x;
+  mRoi.height = abs(mCornerDown.y - mCornerUp.y);  //mLength.y;// +mDisp.y;
 
+
+  //ofLog(OF_LOG_NOTICE) << mRoi.x << " " << mRoi.y << " - " << mRoi.width << " " << mRoi.height;
   // Copy the data into new matrix
-  if (mRoi.width < mDim.x && mRoi.height < mDim.y) {
-    if (mRoi.x > 0 && mRoi.y > 0 && mRoi.width < mDim.x &&
-        mRoi.height < mDim.y) {
+  if (mRoi.width <= mDim.x && mRoi.height <= mDim.y &&
+      (mRoi.x >= 0 && mRoi.y >= 0 && mRoi.width <= mDim.x &&  mRoi.height <= mDim.y)) {
       cv::Mat cutMat(inputVideo, mRoi);
       cutMat.copyTo(mCropMat);
-    } else {
-      ofLog(OF_LOG_NOTICE) << "erro crop";
-    }
-  } else {
-    inputVideo.copyTo(mCropMat);
-    ofLog(OF_LOG_NOTICE) << "erro crop";
+  }
+  else {
+      inputVideo.copyTo(mCropMat);
+      ofLog(OF_LOG_NOTICE) << "error crop dims Dims";
   }
 
 }
@@ -210,8 +206,8 @@ void CamCapture::drawCropRoi() {
   ofEndShape();
 
   ofSetColor(255, 50, 50, 155);
-  ofDrawCircle(mCornerDown.x, mCornerDown.y, 5, 5);
-  ofDrawCircle(mCornerUp.x, mCornerUp.y, 5, 5);
+  ofDrawCircle(mCornerDown.x, mCornerDown.y, 30, 30);
+  ofDrawCircle(mCornerUp.x, mCornerUp.y, 30, 30);
 }
 //-----------------------------------------------------------------------------
 void CamCapture::drawCropImg() {
@@ -220,7 +216,7 @@ void CamCapture::drawCropImg() {
   imgCut.update();
 
   ofSetColor(200, 200);
-  imgCut.draw(mCornerUp.x, mCornerUp.y, mLength.x + mDisp.x, mLength.y + mDisp.y);
+  imgCut.draw(mCornerUp.x, mCornerUp.y, abs(mCornerDown.x - mCornerUp.x), abs(mCornerDown.y - mCornerUp.y));
 
   ofxCv::drawMat(mCropMat, 0, 200, 200, 200);
   imgCut.draw(0, 400, 200, 200);

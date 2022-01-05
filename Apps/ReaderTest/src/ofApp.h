@@ -20,6 +20,14 @@
 #define QR_4x4_50   0
 #define QR_6x6_1000 11
 
+enum debugConfiguration {
+    INPUT_IMG = 0,
+    CUT_IMG = 1,
+    GRID_POS = 2,
+    DEBUG_COLOR = 3,
+    RELEASE = 4
+};
+
 
 class ofApp: public ofBaseApp
 {
@@ -28,9 +36,18 @@ public:
     void setup();
 	void update();
 	void draw();
+    void exit();
+
+    void mouseDragged(int x, int y, int button);
+    void keyPressed(int key);
     void keyReleased(int key);
 
     void ofScreenMarkers();
+
+    //gui
+    void setupGUI();
+    void drawGUI();
+    void updateGUI();
 
     // constants   
     const int videoDeviceId = 1;
@@ -40,13 +57,6 @@ public:
 
     ofFbo    mFbo;
 
-    GridDetectorRef  mGridDetector;
-
-    // grabber
-    ofVideoGrabber grabber;
-    cv::Size videoSize = cv::Size(640, 480);
-    ofImage imgVideoUndistort;
-
     //camera grabber
     CamCaptureRef mCamGrabber;
     ofImage mImageDetector;
@@ -55,9 +65,26 @@ public:
     ArucoDetectorRef mArucoDetector;
     int mTotalMarkers;
     bool mRefimentDetector;
+    bool mEnableCrop;
+
+    //grid values
+    GridDetectorRef  mGridDetector;
+    glm::vec2 mGridLocation;
+    glm::vec2  mGridStep;
+    bool mCalculateGrid;
+    bool mEnableGridPos; 
 
     //grid calculations
 
     int numMarkers;
+
+    //color
+    ofxDatSliderRef mGammaValue;
+    ofxDatSliderRef mAlphaValue;
+    ofxDatSliderRef mBetaValue;
+
+    bool mEnableColorPros;
+
+    debugConfiguration mConfigureMode;
 
 };
