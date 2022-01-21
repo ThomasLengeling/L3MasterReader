@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
-
-#include "ofMain.h"
-#include "CommonTypes.h"
-
 /*
 Class for each  Physical Block
 */
+
+#include <memory>
+
+#include "ofMain.h"
+
+
 
 class QRBlock;
 typedef std::shared_ptr<QRBlock> QRBlockRef;
@@ -53,7 +54,6 @@ private:
   float mRot;
 
   bool mEnable;
-  MarkerType mMType;
 
   std::pair<int, int> mIdType;
 };

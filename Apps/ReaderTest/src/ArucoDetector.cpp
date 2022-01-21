@@ -17,7 +17,7 @@ void ArucoDetector::resetMinMax() {
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
   float markerLength     = 0.0162;     // 0.0165
   float markerSeparation = 0.0042; // 0045
-  int dictionaryId       = cv::aruco::DICT_6X6_1000; //0
+  int dictionaryId       = cv::aruco::DICT_4X4_50; //0
   std::string outputFile = "./cal.txt";
 
   int calibrationFlags = 0;

@@ -13,10 +13,10 @@ LLL
 #include "RectDetector.h"
 #include "QRBlock.h"
 
-class MarkerAruco;
+class TangibleMarker;
 class ProbabiltyAruco;
 
-typedef std::shared_ptr<MarkerAruco> MarkerArucoRef;
+typedef std::shared_ptr<TangibleMarker> TangibleMarkerRef;
 
 //------------------------------------------------------------------------------
 class ProbabiltyAruco{
@@ -32,18 +32,19 @@ private:
 };
 
 //------------------------------------------------------------------------------
-class MarkerAruco : public RectDetector, public ProbabiltyAruco{
+class TangibleMarker : public RectDetector, public ProbabiltyAruco{
 public:
-    MarkerAruco() : RectDetector(), ProbabiltyAruco() {
+    TangibleMarker() : RectDetector(), ProbabiltyAruco() {
         mGridId = -1;
         mMakerId = -1;
+        mInteractiveId = -1;
         mBType = BlockType::grid;
         mIdType = std::make_pair(-1, 0);
         mDebugPos = false;
     }
 
-    static MarkerArucoRef create(){
-        return std::make_shared<MarkerAruco>();
+    static TangibleMarkerRef create(){
+        return std::make_shared<TangibleMarker>();
     }
 
     void setMarkerId(int i){mMakerId = i;}
@@ -51,6 +52,9 @@ public:
 
     void setGridId(int i){mGridId = i;}
     int getGridId(){return mGridId;}
+
+    void setInteractiveId(int id) { mInteractiveId = id; }
+    float getInteractiveId() { return mInteractiveId; }
 
     void setPos(glm::vec2 mpos){mPos = mpos;}
     glm::vec2 getPos(){return mPos;}
@@ -79,10 +83,12 @@ public:
 
 private:
     //QR id
-    int        mMakerId;
+    int        mMakerId; //aruco id
 
     //grid id
-    int        mGridId;
+    int        mGridId; //physical id
+
+    int        mInteractiveId; //physical id mapped to the interactive grid
 
     //orientation of the marker
     int        mOrientation;

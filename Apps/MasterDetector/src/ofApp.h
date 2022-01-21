@@ -1,177 +1,145 @@
-/*
-
-Thomas Sanchez Lengeling
-March, 2019
-
-Living Line
-
-*/
-
 #pragma once
 
 #include "ofMain.h"
-#include "ofxNetwork.h"
 
-#include <algorithm>
-#include <ctime>
-#include <iostream>
-#include <map>
-#include <vector>
+#include "ofxCv.h"
+#include "ofxOpenCv.h"
 
 #include <opencv2/aruco.hpp>
+
 #include <opencv2/calib3d.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-// addons
-#include "ofxCv.h"
-#include "ofxDatGui.h"
-#include "ofxOpenCv.h"
-
-#include "CommonTypes.h"
-#include "QRDetector.h"
-#include "MarkerAruco.h"
-#include "gui.h"
-#include "GridImage.h"
-#include "GridDetector.h"
+#include "ArucoDetector.h"
 #include "QRBlock.h"
-
-#define NUM_CAM_INPUTS 1
-
-#define CAM_WIDTH  1280  //1920
-#define CAM_HEIGHT 720 //1080
-
-#define CAM_FRAMERATE 30 //10
+#include "CamCapture.h"
+#include "GridDetector.h"
+#include <map>
+#include <utility>
 
 
-class ofApp : public ofBaseApp {
+#define NUM_CAM_INPUTS 4
 
+#define CAM_WIDTH  1920  //1920
+#define CAM_HEIGHT 1080 //1080
+
+#define CAM_FRAMERATE 10 //10
+
+#define MAX_MARKERS  267
+
+
+
+enum debugConfiguration {
+    INPUT_IMG = 0,
+    CUT_IMG = 1,
+    GRID_POS = 2,
+    DEBUG_COLOR = 3,
+    RELEASE = 4,
+    DEBUG = 5
+};
+
+
+
+
+class ofApp: public ofBaseApp
+{
 public:
-  void setup();
-  void update();
-  void draw();
-  void exit();
 
-  void keyPressed(int key);
-  void keyReleased(int key);
-  void mouseMoved(int x, int y);
-  void mouseDragged(int x, int y, int button);
-  void mousePressed(int x, int y, int button);
-  void mouseReleased(int x, int y, int button);
-  void mouseEntered(int x, int y);
-  void mouseExited(int x, int y);
-  void windowResized(int w, int h);
-  void dragEvent(ofDragInfo dragInfo);
-  void gotMessage(ofMessage msg);
+    void setup();
+	void update();
+	void draw();
+    void exit();
 
-  // system values
-  bool mDebug;
+    void mouseDragged(int x, int y, int button);
+    void mouseReleased(int x, int y, int button);
+    void mousePressed(int x, int y, int button);
+    void keyPressed(int key);
+    void keyReleased(int key);
 
-  //GUI functions
-  void setupGUI();
-  void updateGUI();
-  void drawGUI();
+    void offScreenMarkers();
 
-  void setupValues();
+    //setup
+    void setupValues();
+    void setupGridInfo();
+    void setupCamCalibration();
+    void setupUDPConnection();
+    void setupCams();
+    void setupGUI();
+    void setupArucoDetector();
+    void setupGridDetector();
 
-  // Calibrate
-  void setupCalibration();
-  void setupDetection();
+    //update
+    void updateUDP();
+    void updateGUI();
 
-  void updateGrid();
-  void recordGrid();
-
-  // clean Detection
-  void cleanDetection();
-
-  //draw grid info
-  void offScreenRenderGrid();
-
-  //create network communication
-  void setupConnection();
-
-  // save JSON file
-  void saveJSONBlocks();
-
-  //draw info on screen
-  void drawInfoScreen();
-
-  //setuo video for testing
-  void setupVideo();
-
-  //setup cameras for input detectors
-  void setupCam();
-
-  //setup markers detector
-  void   setupGridDetector();
-
-  // GUI
-  bool mDrawGUI;
-  ofxDatButtonRef mBDebugVideo;
-  ofxDatButtonRef mBDebugVideoGrid;
-  ofxDatButtonRef mBDebugGrid;
-  ofxDatButtonRef mBSingleGrid;
-  ofxDatButtonRef mBFullGrid;
-  ofxDatButtonRef mBFullCamView;
-
-  //cam calibration process
-  ofxDatButtonRef mCamCalibration;
-  ofxDatButtonRef mCamPerspective;
-
-  ofxDatButtonRef mBEnableCrop;
-  ofxDatButtonRef mBCalibrateGrid;
-  ofxDatButtonRef mBEnableVideo;
-  ofxDatButtonRef mBDebugMarkers;
-
-  ofxDatSliderRef mGammaValue;
-  ofxDatSliderRef mAlphaValue;
-  ofxDatSliderRef mBetaValue;
-
-  ofxDatMatrixRef mBGridSelect;
-  ofxDatButtonRef mBCloseCams;
+    //draw
+    void drawGUI();
 
 
+    // send commands
+    ofxUDPManager mUDPConnectionTable;
+    std::string   mUDPIp;
+    int           mUDPPort;
 
-  // 4 camera render
-  ofFbo mFboSingle;
-  std::vector<ofFbo> mFboGrid;
-  ofFbo mFboFullGrid;
+    //network for Radar communication
+    ofxUDPManager mUDPConnectionRadar;
+    std::string   mUDPRadarIp;
+    int           mUDPRadarPort;
 
-  bool mSingleCam;
 
-  //grid image
-  std::vector<GridImageRef> mGridImg;
-  int mCurrentInputIdx;
+    // 4 camera render
+    ofFbo mFboSingle;
+    std::vector<ofFbo> mFboGrid;
+    ofFbo mFboFullGrid;
 
-  ofTexture mCurrentVideo;
+    //camera grabber
+    std::vector < CamCaptureRef> mCamGrabber;
+    int mCurrentCamId;
+    ofImage mImageDetector;
+    
 
-  // aruco etector
-  std::vector<QRDetectorRef> mArucoDetector;
-  int mTotalMarkers;
-  bool mRefimentDetector;
+    // aruco detector
+    std::vector < ArucoDetectorRef> mArucoDetector;
+    int mMaxMarkers;
+    bool mRefimentAruco;
+    bool mEnableCrop;
 
-  ofImage mInputDetectImg;
+    //grid values
+    std::vector < GridDetectorRef>  mGridDetector;
+    glm::vec2 mGridLocation;
+    glm::vec2  mGridStep;
+    bool mCalculateGrid;
+    bool mEnableGridPos;
 
-  //inputs
-  int mNumInputs;
+    //
+    std::vector<glm::vec2> mGridSizes;
 
-  glm::vec2 mFullGridDim;
-  int mTotalMaxMarkers;
-  std::vector<glm::vec2> mGridSizes;
-  std::vector<int> mMaxMarkers;
+    //grid calculations
 
-  //grid detector
-  std::vector<GridDetectorRef> mGridDetector;
-  bool mSortMarkers;
+    int numMarkers;
 
-  // send commands
-  ofxUDPManager mUDPConnectionTable;
-  std::string   mUDPIp;
-  int           mUDPPort;
+    //GUI
+    bool            mDrawGUI;
+    ofxDatSliderRef mGammaValue;
+    ofxDatSliderRef mAlphaValue;
+    ofxDatSliderRef mBetaValue;
 
-  //network for Radar communication
-  ofxUDPManager mUDPConnectionRadar;
-  std::string   mUDPRadarIp;
-  int           mUDPRadarPort;
+    ofxDatButtonRef mBSingleGrid;
+    ofxDatButtonRef mBFullGrid;
+    ofxDatButtonRef mCamCalibration;
+    ofxDatMatrixRef mBGridSelect;
+
+    bool mEnableColorPros;
+
+    debugConfiguration mConfigureMode;
+
+    int mHighlightMarkerId;
+    ofImage mBaseGrid;
+
+    std::vector<ofVideoDevice> camlist;
+
+    std::vector< std::map<int, int> > mPrevGridArea;
+    std::vector< std::map<int, int> > mGridArea;
 
 };

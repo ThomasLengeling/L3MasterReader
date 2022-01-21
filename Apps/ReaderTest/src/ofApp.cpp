@@ -18,8 +18,8 @@ void ofApp::setup()
     mVideoGrabber.listDevices();
 
     mCamGrabber = CamCapture::create(glm::vec2(1920, 1080));
-    mCamGrabber->setId(0);
-    mCamGrabber->setupCam(0, 30);
+    mCamGrabber->setId(1);
+    mCamGrabber->setupCam(1, 30);
 
 
     // oF app
@@ -178,14 +178,14 @@ void ofApp::ofScreenMarkers() {
 
         int camWidth = mCamGrabber->getROI().width;
 
-        mGridDetector->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
+        //mGridDetector->drawDetectedGridIn(ofGetWindowWidth() - spaceX - sqsize * 2, 20, sqsize, sqspace);
     }
         break;
 
     case RELEASE:
     {
         ofSetColor(255);
-        mImageDetector.draw(0, 0);
+        mImageDetector.draw(0, 0, 640, 480);
         float sqsize = 36;
         float sqspace = 5;
 
@@ -196,7 +196,7 @@ void ofApp::ofScreenMarkers() {
         //cut RIO
         int camWidth = mCamGrabber->getROI().width;
 
-        mGridDetector->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
+        mGridDetector->drawDetectedGridIn(ofGetWindowWidth() - spaceX - sqsize*2, 20, sqsize, sqspace);
     }
         break;
 
@@ -212,13 +212,25 @@ void ofApp::draw()
     ofSetColor(0, 0, 0, 255);
     ofRect(0, 0, ofGetWidth(), ofGetHeight());
 
+    switch (mConfigureMode) {
+    case INPUT_IMG:
+    case CUT_IMG:
+    case DEBUG_COLOR:
+    case GRID_POS:
+        ofSetColor(255);
+        mCamGrabber->drawImage(0, 0, 640, 480);
+        mImageDetector.draw(0, 640, 640, 480);
+        mFbo.draw(0, 0);
+        break;
+    case RELEASE:
+        ofSetColor(255);
+        mFbo.draw(0, 0);
+        mCamGrabber->drawImage(0, 0, 640, 480);
+        mImageDetector.draw(0, 640, 640, 480);
+      
+        break;
+    }
 
-    ofSetColor(255);
-    mCamGrabber->drawImage(0, 0, 640, 360);
-    mImageDetector.draw(0, 640, 640, 360);
-
-    mFbo.draw(0, 0);
-    
     drawGUI();
 
     mGridDetector->recordGrid();
@@ -299,8 +311,6 @@ void ofApp::keyReleased(int key)
 
     case 'u':
         break;
-
-
 
 
 

@@ -1,9 +1,9 @@
 /*
 
 Thomas Sanchez Lengeling
-March, 2019
+December, 2021
 
-Living Line
+L3
 
 */
 
@@ -17,6 +17,7 @@ Living Line
 #include <iostream>
 #include <map>
 #include <vector>
+#include <glm/gtx/fast_square_root.hpp>
 
 // addons
 #include "ofxCv.h"
@@ -24,9 +25,9 @@ Living Line
 
 #include "QRBlock.h"
 #include "CommonTypes.h"
-#include "QRDetector.h"
-#include "MarkerAruco.h"
-#include "GridImage.h"
+#include "ArucoDetector.h"
+#include "CamCapture.h"
+#include "TangibleMarker.h"
 
 #define RAD_DETECTION 38
 #define MOUSE_RADIUS  17
@@ -55,17 +56,17 @@ public:
     int getMaxMarkers(){return mMaxMarkers;}
 
     void setupGridJsonPos(std::string filePos);
-    void generateGridPos();
+    void generateGridPos(int startGridX = 100, int startGridY= 100, int stepX= 50, int stepY= 50);
     void setupBlocks();
 
     void generateMarkers(std::vector<int> & ids, std::vector<QRBlockRef> & blocks, bool sort = false );
-    void clasification();
+
     void updateBlockTypes();
 
     void drawMarkers( );
 
     //update grid positions
-    void toogleDebugGrid(){mDebugGrid =!mDebugGrid;}
+    void enableDebugGrid(bool toggle = true) { mDebugGrid = toggle; }
     void toogleUpdateGrid(){mUpdateGrid = !mUpdateGrid;}
 
     void gridPosIdInc();
@@ -74,6 +75,8 @@ public:
     void calibrateGrid();
     void recordGrid();
 
+    void cleanDuplicatePos();
+
     void setupCleaner();
     void updateCleaner();
     void resetCleaner();
@@ -81,6 +84,9 @@ public:
     bool isDoneCleaner(){return mCleanDone;}
 
     void setGridPos(glm::vec2 mousePos);
+    void setGridPos(glm::vec2 mousePos, int index);
+
+    void setHighlightMarkerId(int id) { mHightlightMarkeId = id; }
 
     //save json files
     void saveGridJson();
@@ -88,31 +94,24 @@ public:
 
     //draw detected grid
     void drawDetectedGrid(float posx, float posy, float size = 20, float space = 5);
+    void drawDetectedInteraction(int id, float posx, float posy, float size = 20, float space = 5);
     void drawDetectedGridIn(float posx, float posy, float size = 20, float space = 5);
-    void drawDetectedBlock(float posx, float posy, float size = 20, float space = 5);
 
     void drawBlock(float posx, float posy, float size = 20, float space = 5);
 
-    std::string getUDPMsg(){return mUDPMsgIds;}
-    std::vector< std::string > getUDPMsgVector(){return mUDPStrIds;}
-    std::vector< std::vector<int> > getUDPVector(){return mUDPVecIds;}
-
-    std::string getUPDNumTypes(){return mUDPNumTags;}
-
     void drawRotation();
+
+    std::map<int, int> getGridInter() {
+        return mGridIdPair;
+    }
+
+    std::map<int, int > getEmptyGrid() { return mEmptyGrid; }
 
 private:
 
     //tags
-    std::string mUDPMsgIds;
-
-    //tags
-    std::vector< std::string > mUDPStrIds;
-
-    std::vector< std::vector<int> > mUDPVecIds;
-
-    //tags num tags
-    std::string mUDPNumTags;
+    std::map<int, int> mGridIdPair;
+    std::map<int, int> mEmptyGrid;
 
     //dimentions
     glm::vec2  mGridDim;
@@ -134,6 +133,9 @@ private:
     int mCurrentGridId;
 
     bool mRecordOnce;
+
+    //highlight grid marker
+    int mHightlightMarkeId;
 
     //clearner
     int mWindowIterMax;
@@ -166,7 +168,7 @@ private:
     std::map<int, int> mCenterCounter;
 
     // check if found marker
-    std::vector<MarkerArucoRef> mMarkers;
+    std::vector<TangibleMarkerRef> mMarkers;
 
     std::vector<QRBlockRef> mCurrBlock;
     std::vector<std::vector<QRBlockRef>> mTmpBlocks;
