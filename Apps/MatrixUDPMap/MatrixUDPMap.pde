@@ -11,7 +11,7 @@
  * -- note that all Pd input/output messages are completed with the characters
  * ";\n". Don't refer to this notation for a normal use. --
  */
- 
+
 import spout.*;
 Spout spout;
 
@@ -28,14 +28,17 @@ String[] areaPos02 = {};
 String[] areaPos03 = {};
 String[] areaPos04 = {};
 
+String[] walkHeatStr = {};
+float[] walkHeatMap=new float[21*68];
+
 PGraphics offScreen;
 
 void setup() {
 
-  size(1280, 720, P3D); //3508,1080 img size
+  size(680, 300, P3D);// img size
 
   offScreen = createGraphics(3508, 1080, P3D);
-  offScreen.smooth(8);
+  //offScreen.smooth(8);
   smooth(8);
   surface.setLocation(0, 0);
   surface.setResizable(false);
@@ -44,13 +47,12 @@ void setup() {
 
   // create a new datagram connection on port 6000
   // and wait for incomming message
-  udp = new UDP( this, 15800 );
+  udp = new UDP( this, 15810 );
   //udp.log( true );     // <-- printout the connection activity
   udp.listen( true );
-  
+
   spout = new Spout(this);
-   spout.setSenderName("SpoutP");
-   
+  spout.setSenderName("Spout-Table");
 }
 
 //process events
@@ -60,7 +62,7 @@ void draw() {
 
   offScreen.beginDraw();
   offScreen.background(0);
-  offScreen.image(map, 0,  0, offScreen.width, offScreen.height);
+  offScreen.image(map, 0, 0, offScreen.width, offScreen.height);
 
   for (int i = 0; i < 12; i++) {
     for (int j = 0; j < 23; j++) {
@@ -78,8 +80,8 @@ void draw() {
         offScreen.rect(x, y, 44.5, 44.5);
 
         offScreen.fill(255);
-       // offScreen.text(marker+" ", x + 7, y+10);
-       // offScreen.text(index+" ", x + 7, y+24);
+        // offScreen.text(marker+" ", x + 7, y+10);
+        // offScreen.text(index+" ", x + 7, y+24);
       }
     }
   }
@@ -94,8 +96,8 @@ void draw() {
     int index =0;
 
     offScreen.fill(255);
-   // offScreen.text(marker+" ", x + 7, y+10);
-   // offScreen.text(index+" ", x + 7, y+24);
+    // offScreen.text(marker+" ", x + 7, y+10);
+    // offScreen.text(index+" ", x + 7, y+24);
   }
 
   for (int i = 0; i < 3; i++) {
@@ -112,8 +114,8 @@ void draw() {
         offScreen.rect(x, y, 43.5, 43.5);
 
         offScreen.fill(255);
-       // offScreen.text(marker+" ", x + 7, y+10);
-       // offScreen.text(index+" ", x + 7, y+24);
+        // offScreen.text(marker+" ", x + 7, y+10);
+        // offScreen.text(index+" ", x + 7, y+24);
       }
     }
   }
@@ -132,17 +134,59 @@ void draw() {
         offScreen.rect(x, y, 43.5, 43.5);
 
         offScreen.fill(255);
-       // offScreen.text(marker+" ", x + 7, y+10);
-       // offScreen.text(index+" ", x + 7, y+24);
+        // offScreen.text(marker+" ", x + 7, y+10);
+        // offScreen.text(index+" ", x + 7, y+24);
       }
     }
   }
 
-  offScreen.endDraw();
 
-  image(offScreen, 0, 0, width, height);
+
+
+
+  for (int i = 0; i <21; i++) {
+    for (int j = 0; j <68; j++) {
+      int index = j + i*68;
+      float heatNorm = walkHeatMap[index];
+      float recSize =  43.5;
+      float x = recSize*j + 8.18*((float )j);
+      float y = recSize*i + 8.02*((float)i);
+
+      selectHeatColor(heatNorm);
+      //color c = lerpColor(color(255, 25, 28), color(26, 150, 65), heatNorm);
+
+      //offScreen.fill(c);
+      offScreen.noStroke();
+      offScreen.rect(x, y, recSize, recSize);
+    }
+  }
+  offScreen.endDraw();
+  image(offScreen, 0, 0, width, height);//, 1920, 1080);
   spout.sendTexture(offScreen);
-  
+}
+
+void selectHeatColor(float hcolor) {
+  if (hcolor == 0.0 ) {
+    offScreen.fill(255, 0, 0);
+  } else if (hcolor > 0.0 && hcolor <= 0.17) {
+    offScreen.fill(249, 157, 89);
+  } else if (hcolor > 0.17 && hcolor <= 0.25) {
+    offScreen.fill(254, 201, 129);
+  } else if (hcolor> 0.25 && hcolor <= 0.33 ) {
+    offScreen.fill(235, 247, 147);
+  } else if (hcolor > 0.33 && hcolor <= 0.42) {
+    offScreen.fill(216, 251, 165);
+  } else if (hcolor > 0.42 && hcolor <= 0.5) {
+    offScreen.fill(196, 230, 135);
+  } else if (hcolor > 0.5 && hcolor <= 0.67) {
+    offScreen.fill(88, 180, 83);
+  } else if (hcolor > 0.67 && hcolor <= 0.75) {
+    offScreen.fill(88, 220, 83);
+  } else if (hcolor > 0.75 && hcolor <= 0.92) {
+    offScreen.fill(26, 150, 65);
+  } else if (hcolor > 0.92 && hcolor <= 1.0) {
+    offScreen.fill(0, 226, 71);
+  }
 }
 
 void setColor(int id) {
@@ -172,15 +216,12 @@ void setColor(int id) {
  * send the current key value over the network
  */
 void keyPressed() {
+  if (key == 'a') {
+    for (int i = 0; i<21*68; i++) {
+      walkHeatMap[i]= random(0,1);
+    }
+  }
 
-  String message  = str( key );  // the message to send
-  String ip       = "localhost";  // the remote IP address
-  int port        = 6100;    // the destination port
-
-  // formats the message for Pd
-  message = message+";\n";
-  // send the message
-  udp.send( message, ip, port );
 }
 
 /**
@@ -192,27 +233,50 @@ void keyPressed() {
  * sender IP address and his port) can be set like below.
  */
 // void receive( byte[] data ) {       // <-- default handler
-void receive( byte[] data, String ip, int port ) {  // <-- extended handler
+void receive( byte[] data, String ip, int port ) {  // <-- extended handle
 
+  println(port);
+  if (port == 15300) {
 
-  // get the "real" message =
-  // forget the ";\n" at the end <-- !!! only for a communication with Pd !!!
-  data = subset(data, 0, data.length-1);
-  String [] message = new String( data ).split(" ");
-  if (message.length>0) {
+    // get the "real" message =
+    // forget the ";\n" at the end <-- !!! only for a communication with Pd !!!
+    data = subset(data, 0, data.length-1);
+    String [] message = new String( data ).split(" ");
+    if (message.length>0) {
 
-    if (message[0].equals( "i1")) {
-      areaPos01 = Arrays.copyOfRange(message, 1, message.length);
-      println( "receive: \""+areaPos01[0]+"\" from "+ip+" on port "+port+" "+areaPos01.length );
-    } else if (message[0].equals("i2")) {
-      areaPos02 = Arrays.copyOfRange(message, 1, message.length);
-      println( "receive: \""+areaPos02[0]+"\" from "+ip+" on port "+port+" "+areaPos02.length );
-    } else if (message[0].equals("i3")) {
-      areaPos03 = Arrays.copyOfRange(message, 1, message.length);
-      println( "receive: \""+areaPos03[0]+"\" from "+ip+" on port "+port+" "+areaPos03.length );
-    } else if (message[0].equals("i4")) {
-      areaPos04 = Arrays.copyOfRange(message, 1, message.length);
-      println( "receive: \""+areaPos04[0]+"\" from "+ip+" on port "+port+" "+areaPos04.length );
+      if (message[0].equals( "i1")) {
+        areaPos01 = Arrays.copyOfRange(message, 1, message.length);
+        println( "receive: \""+areaPos01[0]+"\" from "+ip+" on port "+port+" "+areaPos01.length );
+      } else if (message[0].equals("i2")) {
+        areaPos02 = Arrays.copyOfRange(message, 1, message.length);
+        println( "receive: \""+areaPos02[0]+"\" from "+ip+" on port "+port+" "+areaPos02.length );
+      } else if (message[0].equals("i3")) {
+        areaPos03 = Arrays.copyOfRange(message, 1, message.length);
+        println( "receive: \""+areaPos03[0]+"\" from "+ip+" on port "+port+" "+areaPos03.length );
+      } else if (message[0].equals("i4")) {
+        areaPos04 = Arrays.copyOfRange(message, 1, message.length);
+        println( "receive: \""+areaPos04[0]+"\" from "+ip+" on port "+port+" "+areaPos04.length );
+      }
     }
   }
+
+  if (port == 15810 || port == 54934) {
+    data = subset(data, 0, data.length-1);
+    String [] message = new String( data ).split(" ");
+    if (message.length>0) {
+
+      if (message[0].equals("wp")) {
+        walkHeatStr = Arrays.copyOfRange(message, 1, message.length);
+        //println( "receive: \""+walkHeatStr[0]+"\" from "+ip+" on port "+port+" "+walkHeatStr.length );
+        for (int i = 0; i<walkHeatStr.length; i++) {
+          walkHeatMap[i]=Float.parseFloat(walkHeatStr[i]);
+        }
+      }
+    }
+  }
+}
+
+void keyPressed() {
+
+
 }

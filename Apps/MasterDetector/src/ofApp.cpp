@@ -19,7 +19,7 @@ void ofApp::setup()
 
     // oF app
     ofSetVerticalSync(false);
-    ofSetFrameRate(60);
+    ofSetFrameRate(30);
     ofSetBackgroundAuto(false);
     //ofBackground(0);
 
@@ -42,6 +42,9 @@ void ofApp::setup()
     ofLog(OF_LOG_NOTICE) << "finished setup";
 
     mHighlightMarkerId = 0;
+
+
+    spaecialGridInter01 = {37, 38, 39, 40, 41, 42, 60, 61, 62, 63, 64, 65};
 
 }
 
@@ -108,7 +111,7 @@ void ofApp::update()
                 mGridDetector.at(currentId)->generateMarkers(mArucoDetector.at(currentId)->getTagIds(), mArucoDetector.at(currentId)->getBoard());
 
                 //update error check
-                mGridDetector.at(currentId)->updateCleaner();
+                mGridDetector.at(currentId)->updateProablity();
             }
 
         }
@@ -151,7 +154,7 @@ void ofApp::update()
                     mGridDetector.at(i)->generateMarkers(mArucoDetector.at(i)->getTagIds(), mArucoDetector.at(i)->getBoard());
 
                     //update errors
-                    mGridDetector.at(i)->updateCleaner();
+                    mGridDetector.at(i)->updateProablity();
                     i++;
                 }
 
@@ -176,7 +179,7 @@ void ofApp::update()
 void ofApp::updateUDP() {
     // calculate probabilyt and clean nois
     if (mBSingleGrid->isActive()) {
-        mGridDetector.at(mCurrentCamId)->cleanGrid();
+       mGridDetector.at(mCurrentCamId)->calculateProbabilityGrid();
 
         //send a single grid
         if (mGridDetector.at(mCurrentCamId)->isDoneCleaner()) {
@@ -185,32 +188,39 @@ void ofApp::updateUDP() {
            // mUDPConnectionTable.Send(udpMsg.c_str(), udpMsg.length());
         }
 
-        mGridDetector.at(mCurrentCamId)->resetCleaner();
+        mGridDetector.at(mCurrentCamId)->resetProbabilty();
     }
     else if (mBFullGrid->isActive()) {
 
         //if we have clean succesfully 4 times the.
         int doneClean = 0;
         for (auto& gridDetector : mGridDetector) {
-            gridDetector->cleanGrid();
+            
             if (gridDetector->isDoneCleaner()) {
+                gridDetector->calculateProbabilityGrid();
                 doneClean++;
             }
         }
+
+        //ofLog(OF_LOG_NOTICE) << "D: " << doneClean << std::endl;
         
         // send UDP in the correct format.
         if (doneClean == 4) {
             std::string compandStr;
             compandStr += "i ";
-            
-            std::map<int, int> empthGrid   = mGridDetector.at(0)->getEmptyGrid();
+
+            std::map<int, int> empthGrid = mGridDetector.at(0)->getEmptyGrid();
 
             std::map<int, int> gridInter01 = mGridDetector.at(0)->getGridInter();
             std::map<int, int> gridInter02 = mGridDetector.at(1)->getGridInter();
             std::map<int, int> gridInter03 = mGridDetector.at(2)->getGridInter();
             std::map<int, int> gridInter04 = mGridDetector.at(3)->getGridInter();
 
-            
+
+            for (auto& grid : gridInter02) {
+
+            }
+
             mPrevGridArea = mGridArea;
 
             mGridArea.clear();
@@ -222,7 +232,7 @@ void ofApp::updateUDP() {
             mGridArea.at(0).insert(gridInter02.begin(), gridInter02.end());
             mGridArea.at(0).insert(gridInter03.begin(), gridInter03.find(276));
 
-           //area 2
+            //area 2
             auto in = gridInter03.find(276);
             mGridArea.at(1).insert(make_pair<const int&, int&>(in->first, in->second));
 
@@ -232,7 +242,7 @@ void ofApp::updateUDP() {
             //area 4
             mGridArea.at(3).insert(gridInter04.begin(), gridInter04.end());
 
-           
+
             //send grid areas if there was a change in the grid 
             for (int i = 0; i < mPrevGridArea.size(); i++) {
                 if (mPrevGridArea.at(i) != mGridArea.at(i)) {
@@ -241,14 +251,14 @@ void ofApp::updateUDP() {
                         mUdpMsg += std::to_string(gridInter.second) + " ";
                     }
                     mUDPConnectionTable.Send(mUdpMsg.c_str(), mUdpMsg.length());
+                    mUDPConnectionRadar.Send(mUdpMsg.c_str(), mUdpMsg.length());
+                    mUDPConnectionGrid.Send(mUdpMsg.c_str(), mUdpMsg.length());
                     //ofLog(OF_LOG_NOTICE) << "Msg: " << mUdpMsg;
                 }
             }
-        }
-        
-        if (doneClean == 4) {
+
             for (auto& gridDetector : mGridDetector) {
-                gridDetector->resetCleaner();
+                gridDetector->resetProbabilty();
             }
         }
     }
@@ -407,25 +417,32 @@ void ofApp::draw()
     drawGUI();
 
     mGridDetector.at(mCurrentCamId)->recordGrid();
-
-    int guiInfo = 900;
-    ofSetColor(255);
-    ofDrawBitmapStringHighlight("app fps: " + ofToString(ofGetFrameRate(), 0), 20, guiInfo);
-    ofDrawBitmapStringHighlight("Current Cam: " + ofToString(mCurrentCamId)+ " - " + ofToString(mGridDetector.at(mCurrentCamId)->getMaxMarkers()), 20, guiInfo + 15);
-    ofDrawBitmapStringHighlight("Detected Markers: " + ofToString(mMaxMarkers), 20, guiInfo + 15*2);
-    ofDrawBitmapStringHighlight("Max Markers: "+to_string(MAX_MARKERS), 20, guiInfo + 15 * 3);
-    ofDrawBitmapStringHighlight("Highlight Marker Id: " + ofToString(mHighlightMarkerId), 20, guiInfo + 15 * 4);
-
-    int i = 0;
-    for (auto& videoName : camlist) {
-        if (i == mCurrentCamId)
-            ofSetColor(255);
-        else
-            ofSetColor(100);
-        ofDrawBitmapStringHighlight("Video: " + to_string(videoName.id) + " - " + videoName.deviceName, 1920 - 750, 900 + i * 15);
-        i++;
+    int guiInfoY = 900;
+    int guiInfoX = 20;
+    if (mBSingleGrid->isActive()) {
+        guiInfoX = 1500;
     }
-    ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1700, 950);
+    
+    ofSetColor(255);
+    ofDrawBitmapStringHighlight("app fps: " + ofToString(ofGetFrameRate(), 0), guiInfoX, guiInfoY);
+    ofDrawBitmapStringHighlight("Current Cam: " + ofToString(mCurrentCamId) + " - " + ofToString(mGridDetector.at(mCurrentCamId)->getMaxMarkers()), guiInfoX, guiInfoY + 15);
+    ofDrawBitmapStringHighlight("Detected Markers: " + ofToString(mMaxMarkers), guiInfoX, guiInfoY + 15 * 2);
+    ofDrawBitmapStringHighlight("Max Markers: " + to_string(MAX_MARKERS), guiInfoX, guiInfoY + 15 * 3);
+    ofDrawBitmapStringHighlight("Highlight Marker Id: " + ofToString(mHighlightMarkerId), guiInfoX, guiInfoY + 15 * 4);
+
+
+    if (!mBSingleGrid->isActive()) {
+        int i = 0;
+        for (auto& videoName : camlist) {
+            if (i == mCurrentCamId)
+                ofSetColor(255);
+            else
+                ofSetColor(100);
+            ofDrawBitmapStringHighlight("Video: " + to_string(videoName.id) + " - " + videoName.deviceName, 1450, 900 + i * 15);
+            i++;
+        }
+    }
+    ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1750, 950);
 
 
     
@@ -524,7 +541,7 @@ void ofApp::keyReleased(int key)
     case 'r':
         mRefimentAruco = !mRefimentAruco;
         break;
-
+    case '8':
     case 's': //save configurations
     {
         ofLog(OF_LOG_NOTICE) << "saved json grid positions: " << mCurrentCamId;
@@ -553,6 +570,7 @@ void ofApp::keyReleased(int key)
         ofSaveJson("img.json", writer);
         break;
     }
+    case '9':
     case 'c':
         mEnableColorPros = !mEnableColorPros;
         break;
@@ -673,5 +691,7 @@ void ofApp::updateGUI() {
 
 //--------------------------------------------------------------
 void ofApp::exit() {
-
+    mUDPConnectionRadar.Close();
+    mUDPConnectionGrid.Close();
+    mUDPConnectionTable.Close();
 }

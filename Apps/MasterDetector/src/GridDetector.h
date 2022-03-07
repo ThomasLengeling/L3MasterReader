@@ -29,9 +29,9 @@ L3
 #include "CamCapture.h"
 #include "TangibleMarker.h"
 
-#define RAD_DETECTION 38
+#define RAD_DETECTION 30
 #define MOUSE_RADIUS  17
-#define MAX_MARKERS 1000
+#define MAX_MARKERS 106
 
 class GridDetector;
 typedef std::shared_ptr<GridDetector> GridDetectorRef;
@@ -78,9 +78,11 @@ public:
     void cleanDuplicatePos();
 
     void setupCleaner();
-    void updateCleaner();
-    void resetCleaner();
-    void cleanGrid();
+    
+    void updateProablity();
+    void resetProbabilty();
+
+    void calculateProbabilityGrid();
     bool isDoneCleaner(){return mCleanDone;}
 
     void setGridPos(glm::vec2 mousePos);
@@ -177,4 +179,5 @@ private:
     std::vector<int> mTagsIds;
     std::vector<int> mFullIds;
 
+    int specialGrid02;
 };

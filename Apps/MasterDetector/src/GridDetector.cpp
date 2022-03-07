@@ -100,7 +100,7 @@ void GridDetector::setupCleaner() {
 
   // cleaner
   mWindowCounter = 0;
-  mWindowIterMax = 5; ///
+  mWindowIterMax = 12; ///
   mCleanDone = false;
 
   for (int i = 0; i < mMaxMarkers; i++) {
@@ -262,6 +262,13 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
             else {
                 ofSetColor(255, 215, 13);
             }
+
+            if (mk->getInteractiveId() == 236 || 
+                mk->getInteractiveId() == 237 || 
+                mk->getInteractiveId() == 259 ||
+                mk->getInteractiveId() == 260) {
+                ofSetColor(0);
+            }
             float x = i * squareSize + i * squareSpace + posx;
             float y = j * squareSize + j * squareSpace + posy;
             ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
@@ -269,7 +276,7 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
             ofSetColor(255);
             //ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
             ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0));
-           ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
+            ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
             i++;
             if (i >= mGridDim.x) {
                 i = 0;
@@ -286,6 +293,34 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
             else {
                 ofSetColor(255, 215, 13);
             }
+
+            if (mk->getInteractiveId() == 194 ||
+                mk->getInteractiveId() == 195 ||
+                mk->getInteractiveId() == 217 ||
+                mk->getInteractiveId() == 218 || 
+                mk->getInteractiveId() == 240 ||
+                mk->getInteractiveId() == 241 ||
+                mk->getInteractiveId() == 244 ||
+                mk->getInteractiveId() == 245 ||
+                mk->getInteractiveId() == 267 ||
+                mk->getInteractiveId() == 268 ||
+
+                mk->getInteractiveId() == 37 ||
+                mk->getInteractiveId() == 38 ||
+                mk->getInteractiveId() == 39 ||
+                mk->getInteractiveId() == 40 ||
+                mk->getInteractiveId() == 41 ||
+                mk->getInteractiveId() == 42 ||
+
+                mk->getInteractiveId() == 60 ||
+                mk->getInteractiveId() == 61 ||
+                mk->getInteractiveId() == 62 ||
+                mk->getInteractiveId() == 63 ||
+                mk->getInteractiveId() == 64 ||
+                mk->getInteractiveId() == 65) {
+                ofSetColor(0);
+            }
+
             float x = i * squareSize + i * squareSpace + posx;
             float y = j * squareSize + j * squareSpace + posy;
             if (j == 0) {
@@ -328,6 +363,21 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
             else {
                 ofSetColor(255, 215, 13);
             }
+
+            if (mk->getInteractiveId() == 20 ||
+                mk->getInteractiveId() == 21 ||
+                mk->getInteractiveId() == 22 ||
+
+                mk->getInteractiveId() == 43 ||
+                mk->getInteractiveId() == 44 ||
+                mk->getInteractiveId() == 45 ||
+
+                mk->getInteractiveId() == 66 ||
+                mk->getInteractiveId() == 67 ||
+                mk->getInteractiveId() == 68) {
+                ofSetColor(0);
+            }
+
             float x = i * squareSize + i * squareSpace + posx;
             float y = j * squareSize + j * squareSpace + posy;
             if (j == 0) {
@@ -390,6 +440,9 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
             else {
                 ofSetColor(255, 215, 13);
             }
+
+
+
             float x = i * squareSize + i * squareSpace + posx;
             float y = j * squareSize + j * squareSpace + posy;
             ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
@@ -487,9 +540,9 @@ void GridDetector::drawMarkers() {
       ofSetColor(200, 80);
       ofDrawCircle(pos.x, pos.y, mRadDetection / 2.0);
     } else {
-      ofSetColor(255, 170, 255, 100);
+      ofSetColor(255, 170, 255, 150);
       ofDrawCircle(pos.x, pos.y, 4);
-      ofSetColor(255, 170, 255, 50);
+      ofSetColor(255, 170, 255, 75);
       ofDrawCircle(pos.x, pos.y, mRadDetection / 2.0);
     }
 
@@ -630,54 +683,60 @@ void GridDetector::recordGrid() {
 }
 
 //-----------------------------------------------------------------------------
-void GridDetector::updateCleaner() {
+void GridDetector::updateProablity() {
   // update clenaer variables
   mWindowCounter++;
   if (mWindowCounter >= mWindowIterMax) {
-    mWindowCounter = 0;
-    mCleanDone = true;
+     // ofLog(OF_LOG_NOTICE) << "update C" << mWindowCounter << " "<<mId;
+      mWindowCounter = 0;
+      mCleanDone = true;
   }
+
+  for (auto& blocks : mTmpBlocks) {
+      for (auto& block : blocks) {
+
+          glm::vec2 blockPos = block->getPos();
+
+          int k = 0;
+          for (auto& mk : mMarkers) {
+              glm::vec2 boardPos = mk->getPos();
+              float dis = glm::fastDistance(blockPos, boardPos);
+              if (dis >= 0 && dis <= mRadDetection) {
+                  mIdsCounter[k] = block->getMarkerId(); // block.mId
+                  mk->incProba();
+                  // not sure i need it break;
+                  //break;
+              }
+              k++;
+          }
+      }
+  }
+
+
 }
 //-----------------------------------------------------------------------------
-void GridDetector::resetCleaner() {
+void GridDetector::resetProbabilty() {
   // reset
   if (mCleanDone) {
     mWindowCounter = 0;
     mCleanDone = false;
   }
-}
 
-//-----------------------------------------------------------------------------
-void GridDetector::cleanGrid() {
+  for (auto& mk : mMarkers) {
+      mk->resetProba();
+  }
+}
+//------------------------------------
+void GridDetector::calculateProbabilityGrid() {
     if (mCleanDone) {
         // clasical probabilty of ocurance
 
         // ofLog(OF_LOG_NOTICE) << "reset proba";
-        for (auto& mk : mMarkers) {
-            mk->resetProba();
-        }
+   
 
         // ofLog(OF_LOG_NOTICE) << "calculate freq";
         // calculate the frequency of ocurance
-        for (auto& blocks : mTmpBlocks) {
-            for (auto& block : blocks) {
 
-                glm::vec2 blockPos = block->getPos();
-
-                int k = 0;
-                for (auto& mk : mMarkers) {
-                    glm::vec2 boardPos = mk->getPos();
-                    float dis = glm::fastDistance(blockPos, boardPos);
-                    if (dis >= 0 && dis <= mRadDetection) {
-                        mIdsCounter[k] = block->getMarkerId(); // block.mId
-                        mk->incProba();
-                        // not sure i need it break;
-                        break;
-                    }
-                    k++;
-                }
-            }
-        }
 
         // ofLog(OF_LOG_NOTICE) << "Update";
 
@@ -686,10 +745,13 @@ void GridDetector::cleanGrid() {
         int i = 0;
   
         mGridIdPair.clear();
-
+        //ofLog(OF_LOG_NOTICE) << "Proba";
         for (auto& mk : mMarkers) {
             float proba = mk->getProba(mWindowIterMax);
-            if (proba >= 0.4) {
+            //ofLog(OF_LOG_NOTICE) << proba <<" "<< mk->getInc();
+
+
+            if (proba >= 0.2) {
                 mk->enableOn();
                 mk->setMarkerId(mIdsCounter[i]);
                 mk->updateIdPair(mIdsCounter[i]);
@@ -710,6 +772,11 @@ void GridDetector::cleanGrid() {
         // std::sort(gridArea01.begin(), gridArea01.end(), [](const auto & a, const auto & b) {return a.second < b.second; });
 
         // done activation and disactivation
+
+
+
+
+
         mTmpBlocks.clear();
         //ofLog(OF_LOG_NOTICE) << "done";
     }

@@ -25,6 +25,7 @@ public:
 
     void incProba();
     float getProba(int num);
+    int getInc() { return mInc; }
     void resetProba();
 private:
     float mProba;

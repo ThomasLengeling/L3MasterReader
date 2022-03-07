@@ -25,7 +25,7 @@ void ofApp::setupValues() {
 
     mConfigureMode = RELEASE;
 
-    mEnableColorPros = false;
+    mEnableColorPros = true;
 
     mGridArea.resize(4);
     
@@ -85,6 +85,10 @@ void ofApp::setupUDPConnection() {
                 mUDPRadarIp = net["network_" + to_string(i)]["ip"].get<std::string>();
                 mUDPRadarPort = int(net["network_" + to_string(i)]["port"]);
             }
+            else if (i == 2) {
+                mUDPGridIp = net["network_" + to_string(i)]["ip"].get<std::string>();
+                mUDPGridPort = int(net["network_" + to_string(i)]["port"]);
+            }
             i++;
         }
         ofLog(OF_LOG_NOTICE) << "Loaded: UDP Table:";
@@ -92,6 +96,9 @@ void ofApp::setupUDPConnection() {
 
         ofLog(OF_LOG_NOTICE) << "Loaded: UDP Radar:";
         ofLog(OF_LOG_NOTICE) << "IP: " << mUDPRadarIp << " Port: " << mUDPRadarPort;
+
+        ofLog(OF_LOG_NOTICE) << "Loaded: UDP Grid:";
+        ofLog(OF_LOG_NOTICE) << "IP: " << mUDPGridIp << " Port: " << mUDPGridPort;
     }
     else {
         mUDPIp = "127.0.0.1";
@@ -111,6 +118,11 @@ void ofApp::setupUDPConnection() {
     settingsTable.sendTo(mUDPIp, mUDPPort);
     settingsTable.blocking = false;
     mUDPConnectionTable.Setup(settingsTable);
+
+    ofxUDPSettings settingsGrid;
+    settingsGrid.sendTo(mUDPGridIp, mUDPGridPort);
+    settingsGrid.blocking = false;
+    mUDPConnectionGrid.Setup(settingsGrid);
 
 
     //send a simple msg.
@@ -182,7 +194,7 @@ void ofApp::setupGUI() {
 
     mGammaValue = ofxDatSlider::create();
     mGammaValue->slider =
-        new ofxDatGuiSlider(mGammaValue->ofParam.set("gamma", 0.65, 0.0, 2.0));
+        new ofxDatGuiSlider(mGammaValue->ofParam.set("gamma", 0.65, 0.0, 3.0));
     mGammaValue->slider->setWidth(390, .5);
     mGammaValue->slider->setPosition(sliderStartX + 30, sliderStartY + 30);
     mGammaValue->slider->onSliderEvent(
@@ -200,7 +212,7 @@ void ofApp::setupGUI() {
     //beta
     mBetaValue = ofxDatSlider::create();
     mBetaValue->slider =
-        new ofxDatGuiSlider(mBetaValue->ofParam.set("beta", 50, 0.0, 255.0));
+        new ofxDatGuiSlider(mBetaValue->ofParam.set("beta", 50, 0.0, 100.0));
     mBetaValue->slider->setWidth(390, .5);
     mBetaValue->slider->setPosition(sliderStartX + 30, sliderStartY + 90);
     mBetaValue->slider->onSliderEvent(

@@ -27,15 +27,24 @@ void ArucoDetector::setupCalibration(int markersX, int markersY) {
   detectorParams = cv::aruco::DetectorParameters::create();
 
   detectorParams->adaptiveThreshWinSizeMin = 3; //20
-  detectorParams->adaptiveThreshWinSizeMax = 50; //50
-  detectorParams->adaptiveThreshWinSizeStep = 5;
+  detectorParams->adaptiveThreshWinSizeMax = 37; //50
+  detectorParams->adaptiveThreshWinSizeStep = 4;
 
-  detectorParams->perspectiveRemovePixelPerCell = 5; // 10
-  detectorParams->perspectiveRemoveIgnoredMarginPerCell = 0.2; //.15
-  detectorParams->errorCorrectionRate = 0.52;
-  detectorParams->maxErroneousBitsInBorderRate = 0.3;
-  detectorParams->minOtsuStdDev = 10;//
+  detectorParams->perspectiveRemovePixelPerCell = 10; // 10
+  detectorParams->perspectiveRemoveIgnoredMarginPerCell = .04; //.15
+  detectorParams->errorCorrectionRate = 0.3;
+  detectorParams->maxErroneousBitsInBorderRate = 0.6;//35
+  detectorParams->minOtsuStdDev = 5;//
+  //detectorParams->maxErroneousBitsInBorderRate = 0.1;
   //detectorParams->maxMarkerPerimeterRate = 5;
+
+  detectorParams->maxErroneousBitsInBorderRate = 15;
+
+  detectorParams->polygonalApproxAccuracyRate = 0.05;//.1
+
+  //detectorParams->markerBorderBits = 0;
+
+  detectorParams->minDistanceToBorder = 5;
 
   bool refindStrategy = false;
 
@@ -68,7 +77,7 @@ void ArucoDetector::detectMarkers(cv::Mat &inputVideo, bool refiment) {
 
   aruco::detectMarkers(input, dictionary, corners, arucoIds, detectorParams);
   // if (refiment) {
-  aruco::refineDetectedMarkers(input, board, corners, arucoIds, rejected);
+  //aruco::refineDetectedMarkers(input, board, corners, arucoIds, rejected);
   //}
 
   if (arucoIds.size() > 0) {

@@ -24,7 +24,7 @@
 #define CAM_WIDTH  1920  //1920
 #define CAM_HEIGHT 1080 //1080
 
-#define CAM_FRAMERATE 10 //10
+#define CAM_FRAMERATE 5 //10
 
 #define MAX_MARKERS  267
 
@@ -87,6 +87,10 @@ public:
     std::string   mUDPRadarIp;
     int           mUDPRadarPort;
 
+    ofxUDPManager mUDPConnectionGrid;
+    std::string   mUDPGridIp;
+    int           mUDPGridPort;
+
 
     // 4 camera render
     ofFbo mFboSingle;
@@ -142,4 +146,5 @@ public:
     std::vector< std::map<int, int> > mPrevGridArea;
     std::vector< std::map<int, int> > mGridArea;
 
+    int   spaecialGridInter01[13];
 };
