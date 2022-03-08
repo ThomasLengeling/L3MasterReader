@@ -44,7 +44,7 @@ void ofApp::setup()
     mHighlightMarkerId = 0;
 
 
-    spaecialGridInter01 = {37, 38, 39, 40, 41, 42, 60, 61, 62, 63, 64, 65};
+   // spaecialGridInter01 = {37, 38, 39, 40, 41, 42, 60, 61, 62, 63, 64, 65};
 
 }
 
