@@ -8,6 +8,8 @@ ArucoDetector::ArucoDetector() {
   mMaxFoundId = 0;
   mMarkerInfo = true;
   mNumFoundMarkers = 0;
+
+
 }
 
 void ArucoDetector::resetMinMax() {
@@ -15,6 +17,51 @@ void ArucoDetector::resetMinMax() {
   mMaxFoundId = 0;
 }
 
+void ArucoDetector::generateDetectorParams() {
+    ofLog(OF_LOG_NOTICE) << "Loading Dectector Params: ";
+    ofFile file("camera_config.json");
+    if (file.exists()) {
+        ofJson detectorParams;
+        file >> detectorParams;
+
+        double adaptiveThreshConstant       = detectorParams["camera"]["adaptiveThreshConstant"].get<double>();
+        int adaptiveThreshWinSizeMax        = detectorParams["camera"]["adaptiveThreshWinSizeMax"].get<int>();
+        int adaptiveThreshWinSizeMin        = detectorParams["camera"]["adaptiveThreshWinSizeMin"].get<int>();
+        int adaptiveThreshWinSizeStep       = detectorParams["camera"]["adaptiveThreshWinSizeStep"].get<int>();
+        
+        int cornerRefinementMaxIterations   = detectorParams["camera"]["cornerRefinementMaxIterations"].get<int>();
+        double cornerRefinementMinAccuracy  = detectorParams["camera"]["cornerRefinementMinAccuracy"].get<double>();
+        int cornerRefinementWinSize         = detectorParams["camera"]["cornerRefinementWinSize"].get<int>();
+        
+        double errorCorrectionRate          =  detectorParams["camera"]["errorCorrectionRate"].get<double>();
+        int markerBorderBits                = detectorParams["camera"]["markerBorderBits"].get<int>();
+        double maxErroneousBitsInBorderRate = detectorParams["camera"]["maxErroneousBitsInBorderRate"].get<double>();
+
+        double maxMarkerPerimeterRate  = detectorParams["camera"]["maxMarkerPerimeterRate"].get<double>();
+        double minCornerDistanceRate   = detectorParams["camera"]["minCornerDistanceRate"].get<double>();
+        int minDistanceToBorder        = detectorParams["camera"]["minDistanceToBorder"].get<int>();
+
+        double minMarkerDistanceRate   = detectorParams["camera"]["minMarkerDistanceRate"].get<double>();
+        double minMarkerPerimeterRate  = detectorParams["camera"]["minMarkerPerimeterRate"].get<double>();
+
+        int minOtsuStdDev              = detectorParams["camera"]["minOtsuStdDev"].get<double>();
+
+        double perspectiveRemoveIgnoredMarginPerCell = detectorParams["camera"]["perspectiveRemoveIgnoredMarginPerCell"].get<double>();
+        int perspectiveRemovePixelPerCell            = detectorParams["camera"]["perspectiveRemovePixelPerCell"].get<int>();
+        double polygonalApproxAccuracyRate           = detectorParams["camera"]["polygonalApproxAccuracyRate"].get<double>();
+
+    }
+    else {
+        ofLog(OF_LOG_NOTICE) << "cannot find file, creating default paramas";
+    }
+}
+
+/*
+https://docs.opencv.org/4.5.5/d5/dae/tutorial_aruco_detection.html
+
+https://docs.opencv.org/4.5.5/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html
+
+*/
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
   float markerLength     = 0.0162;     // 0.0165
   float markerSeparation = 0.0042; // 0045

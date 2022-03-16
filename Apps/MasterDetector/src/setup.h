@@ -29,7 +29,7 @@ void ofApp::setupValues() {
 
     mGridArea.resize(4);
     
-    if (mBaseGrid.load("imgs/01202022_baseinteraction_bw.png")) {
+    if (mBaseGrid.load("imgs/grid_map_hd.png")) {
         ofLog(OF_LOG_NOTICE) << "Loaded Base Interactive Img";
     }
     else {

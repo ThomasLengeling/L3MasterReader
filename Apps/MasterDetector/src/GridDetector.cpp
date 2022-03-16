@@ -50,10 +50,68 @@ void GridDetector::setupBlocks() {
 
 //-----------------------------------------------------------------------------
 void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, int stepY) {
-    std::vector<int> gridIds01 = { 46,47,48,49,50,51,52,53,54,55,69,70,71,72,73,74,75,76,77,78,92,93,94,95,96,97,98,99,100,101,115,116,117,118,119,120,121,122,123,124,138,139,140,141,142,143,144,145,146,147,161,162,163,164,165,166,167,168,169,170,184,185,186,187,188,189,190,191,192,193,207,208,209,210,211,212,213,214,215,216,230,231,232,233,234,235,236,237,238,239,253,254,255,256,257,258,259,260,261,262 };
-    std::vector<int> gridIds02 = { 37,38,39,40,41,42,56,57,58,59,60,61,62,63,64,65,79,80,81,82,83,84,85,86,87,88,102,103,104,105,106,107,108,109,110,111,125,126,127,128,129,130,131,132,133,134,148,149,150,151,152,153,154,155,156,157,171,172,173,174,175,176,177,178,179,180,194,195,196,197,198,199,200,201,202,203,217,218,219,220,221,222,223,224,225,226,240,241,242,243,244,245,246,247,248,249,263,264,265,266,267,268,269,270,271,272 };
-    std::vector<int> gridIds03 = { 21,22,43,44,45,66,67,68,89,90,91,112,113,114,135,136,137,158,159,160,181,182,183,204,205,206,227,228,229,250,251,252,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291};
-    std::vector<int> gridIds04 = { 291,292,293,294,295,296,297,298,299,300 };
+    std::vector<int> gridIds01 = { 216,217,
+264,265,266,267,268,269,270,271,272,273,274,275,
+313,314,315,316,317,318,319,320,321,322,323,324,325,
+362,363,364,365,366,367,368,369,370,371,372,373,374,375,
+412,413,414,415,416,417,418,419,420,421,422,423,424,425,
+461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,
+510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,
+559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,
+608,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,
+657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,
+706,707,708,709,710,711,712,713,714,715,716,717,718,719,720,721,722,723,724,725,
+755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,
+800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825 };
+
+    std::vector<int> gridIds02 = { 36,37,
+85,86,87,88,96,97,98,99,
+135,136,137,138,142,143,144,145,146,147,148,149,
+185,186,187,188,189,190,191,192,193,194,195,196,197,198,
+234,235,236,237,238,239,240,241,242,243,244,245,246,247,
+276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,
+326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,
+376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,
+426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,
+476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,
+526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,
+576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,
+626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,
+676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,
+726,727,728,729,730,731,732,733,734,735,736,737,738,739,
+776,777,778,779,780,781,782,783,784,785,786,787,788 };
+
+    std::vector<int> gridIds03 = { 36,37,
+85,86,87,88,96,97,98,99,
+135,136,137,138,142,143,144,145,146,147,148,149,
+185,186,187,188,189,190,191,192,193,194,195,196,197,198,
+234,235,236,237,238,239,240,241,242,243,244,245,246,247,
+276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,
+326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,
+376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,
+426,427,428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,
+476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,
+526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,
+576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,
+626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,
+676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,
+726,727,728,729,730,731,732,733,734,735,736,737,738,739,
+776,777,778,779,780,781,782,783,784,785,786,787,788 };
+
+    std::vector<int> gridIds04 = { 826,827,828,829,830,831,832,833,834,835,836,837,
+876,877,878,879,880,881,882,883,884,885,886,
+926,927,928,929,930,931,932,933,934,935,
+976,977,978,979,980,981,982,983,984,
+1026,1027,1028,1029,1030,1031,1032,1033,
+1076,1077,1078,1079,1080,1081,1082,1083,
+1126,1127,1128,1129,1130,1131,1132,
+1176,1177,1178,1179,1180,1181,
+1126,1127,1128,1129,1130,
+1276,1277,1278,
+1326,1327,
+1376,1377,
+1426,
+1476 };
 
     std::vector<std::vector<int>> gridPos = { gridIds01, gridIds02, gridIds03, gridIds04 };
 
@@ -61,7 +119,7 @@ void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, in
     int indeY = 0;
     int indeX = 0;
     ofLog(OF_LOG_NOTICE) << "Max Markers: " << mMaxMarkers;
-    for (int i = 0; i < mMaxMarkers; i++) {
+    for (int i = 0; i < gridPos[mId].size(); i++) {
         TangibleMarkerRef m = TangibleMarker::create();
 
         float x = indeX * stepX + startGridX;
@@ -69,6 +127,7 @@ void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, in
 
         m->setPos(glm::vec2(x, y));
         m->setGridId(i);  //
+
         m->setInteractiveId(gridPos[mId].at(i));
         m->setMarkerId(-1);
         mMarkers.push_back(m);
@@ -231,8 +290,8 @@ void GridDetector::drawDetectedGridIn(float posx, float posy, float size,
     } else {
       ofSetColor(255, 215, 13);
     }
-    float x = i * squareSize + i * squareSpace + posx;
-    float y = j * squareSize + j * squareSpace + posy;
+    float x = i * space + posx;
+    float y = j * space + posy;
     ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
 
     ofSetColor(255);
@@ -254,209 +313,35 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
     int j = 0; // mGridDim.y - 1;
     float squareSize = size;
     float squareSpace = space;
-    if (id == 0) {
-        for (auto& mk : mMarkers) {
-            if (mk->isEnable()) {
-                ofSetColor(13, 170, 255);
-            }
-            else {
-                ofSetColor(255, 215, 13);
-            }
 
-            if (mk->getInteractiveId() == 236 || 
-                mk->getInteractiveId() == 237 || 
-                mk->getInteractiveId() == 259 ||
-                mk->getInteractiveId() == 260) {
-                ofSetColor(0);
-            }
-            float x = i * squareSize + i * squareSpace + posx;
-            float y = j * squareSize + j * squareSpace + posy;
-            ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
-
-            ofSetColor(255);
-            //ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
-            ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0));
-            ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
-            i++;
-            if (i >= mGridDim.x) {
-                i = 0;
-                j++;
-            }
+    for (auto& mk : mMarkers) {
+        if (mk->isEnable()) {
+            ofSetColor(13, 170, 255);
         }
-    }
-    else if (id == 1) {
-        for (auto& mk : mMarkers) {
-
-            if (mk->isEnable()) {
-                ofSetColor(13, 170, 255);
-            }
-            else {
-                ofSetColor(255, 215, 13);
-            }
-
+        else {
+            ofSetColor(255, 215, 13);
+        }
+        /*
+        if (id == 0) {
             if (mk->getInteractiveId() == 194 ||
-                mk->getInteractiveId() == 195 ||
-                mk->getInteractiveId() == 217 ||
-                mk->getInteractiveId() == 218 || 
-                mk->getInteractiveId() == 240 ||
-                mk->getInteractiveId() == 241 ||
-                mk->getInteractiveId() == 244 ||
-                mk->getInteractiveId() == 245 ||
-                mk->getInteractiveId() == 267 ||
-                mk->getInteractiveId() == 268 ||
-
-                mk->getInteractiveId() == 37 ||
-                mk->getInteractiveId() == 38 ||
-                mk->getInteractiveId() == 39 ||
-                mk->getInteractiveId() == 40 ||
-                mk->getInteractiveId() == 41 ||
-                mk->getInteractiveId() == 42 ||
-
-                mk->getInteractiveId() == 60 ||
-                mk->getInteractiveId() == 61 ||
-                mk->getInteractiveId() == 62 ||
-                mk->getInteractiveId() == 63 ||
-                mk->getInteractiveId() == 64 ||
-                mk->getInteractiveId() == 65) {
+                mk->getInteractiveId() == 195) {
                 ofSetColor(0);
             }
-
-            float x = i * squareSize + i * squareSpace + posx;
-            float y = j * squareSize + j * squareSpace + posy;
-            if (j == 0) {
-                x = (i+4) * (squareSize + squareSpace) + posx;
-                y = j * (squareSize + squareSpace)  + posy;
-
-            }
-
-            ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
-            ofSetColor(255);
-           // ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
-            ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0));
-            ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
-
-
-            i++;
-
-            //first row only 6 pieces then 
-            if (j == 0 && i == 6) {
-                j++;
-                i = 0;
-                continue;
-            }
-
-            //10 x 10
-            if (j >= 1) {
-                if (i >= 10) {
-                    i = 0;
-                    j++;
-                }
-            }
         }
-    }
-    else if (id == 2) {
-        for (auto& mk : mMarkers) {
+        */
 
-            if (mk->isEnable()) {
-                ofSetColor(13, 170, 255);
-            }
-            else {
-                ofSetColor(255, 215, 13);
-            }
+        float x = i * squareSpace + posx;
+        float y = j * squareSpace + posy;
+        ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
 
-            if (mk->getInteractiveId() == 20 ||
-                mk->getInteractiveId() == 21 ||
-                mk->getInteractiveId() == 22 ||
-
-                mk->getInteractiveId() == 43 ||
-                mk->getInteractiveId() == 44 ||
-                mk->getInteractiveId() == 45 ||
-
-                mk->getInteractiveId() == 66 ||
-                mk->getInteractiveId() == 67 ||
-                mk->getInteractiveId() == 68) {
-                ofSetColor(0);
-            }
-
-            float x = i * squareSize + i * squareSpace + posx;
-            float y = j * squareSize + j * squareSpace + posy;
-            if (j == 0) {
-                x = (i + 1) * (squareSize + squareSpace) + posx;
-                y = j * (squareSize + squareSpace) + posy;
-            }
-            if (j == 12) { //
-                x = 1153;
-                y = 427;
-            }
-            if (j > 12) {
-                x = i * squareSize + i * squareSpace + 1045;
-                y = j * squareSize + j * squareSpace + 133;
-            }
-
-            ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
-            ofSetColor(255);
-            //ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
-            ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0)); 
-            ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
-
-
-            i++;
-
-            //first row only 6 pieces then 
-            if (j == 0 && i == 2) {
-                j++;
-                i = 0;
-                continue;
-            }
-            if (j == 12) { //single block
-                j++;
-                i = 0;
-                continue;
-            }
-
-            if (j > 12) {            //lower right 5x3
-                if (i >= 5) {
-                    i = 0;
-                    j++;
-                }
-            }
-
-            //3x12
-            if (j >= 1 && j < 12) {
-                if (i >= 3) {
-                    i = 0;
-                    j++;
-                }
-            }
- 
-
-        }
-    }
-    else if (id == 3) {
-        for (auto& mk : mMarkers) {
-            if (mk->isEnable()) {
-                ofSetColor(13, 170, 255);
-            }
-            else {
-                ofSetColor(255, 215, 13);
-            }
-
-
-
-            float x = i * squareSize + i * squareSpace + posx;
-            float y = j * squareSize + j * squareSpace + posy;
-            ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
-
-            ofSetColor(255);
-            //ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
-            ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0));
-            ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
-
-            i++;
-            if (i >= mGridDim.y) {
-                i = 0;
-                j++;
-            }
+        ofSetColor(255);
+        //ofDrawBitmapString(mk->getGridId(), x + squareSize / 4.0, y + squareSize * (1.0 / 3.0));
+        ofDrawBitmapString(mk->getInteractiveId(), x + squareSize / 4.0, y + squareSize * (3.0 / 3.0));
+        ofDrawBitmapString(mk->getMarkerId(), x + squareSize / 3.0, y + squareSize * (1.0 / 3.0));
+        i++;
+        if (i >= mGridDim.x) {
+            i = 0;
+            j++;
         }
     }
 }

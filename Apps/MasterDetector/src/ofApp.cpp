@@ -315,8 +315,8 @@ void ofApp::offScreenMarkers() {
         //draw grids
         ofSetColor(255);
        // mImageDetector.draw(0, 0);
-        float sqsize = 20.5;
-        float sqspace = 6.48;
+        float sqsize = 16;
+        float sqspace = 20.37;
 
         glm::vec2 dim = mGridDetector.at(mCurrentCamId)->getDim();
         int spaceX = dim.x * (sqsize + sqspace);
@@ -327,11 +327,20 @@ void ofApp::offScreenMarkers() {
 
         mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
 
-        mBaseGrid.draw(0, 0);
+        ofSetColor(255);
+        ofDrawRectangle(0, 1080 - 850, 1920, 1080 * 0.65);
+
+        ofSetColor(255);
+        ofPushMatrix();
+        //mBaseGrid.draw(200, 1080 - 950, 1920 * 0.9, 1080 * 0.9);
+        mBaseGrid.draw(0, 0, 1920, 1080);
+        ofPopMatrix();
+
+        
 
         int j = 0;
         glm::vec2 pos;
-        std::vector<glm::vec2> gridPos = {glm::vec2(369, 402), glm::vec2(639, 373), glm::vec2(910, 348) , glm::vec2(1505, 320) };
+        std::vector<glm::vec2> gridPos = {glm::vec2(758, 144), glm::vec2(639, 373), glm::vec2(910, 348) , glm::vec2(1505, 320) };
         for (auto& grid : mGridDetector) {
             pos = gridPos[j];
             grid->drawDetectedInteraction(j, pos.x, pos.y, sqsize, sqspace);
@@ -341,8 +350,8 @@ void ofApp::offScreenMarkers() {
 
         //draw cam feed images
 
-        ofSetColor(225);
-        ofDrawRectangle(0, 0, 1920, 240);
+       // ofSetColor(225);
+       // ofDrawRectangle(0, 0, 1920, 240);
 
         if (mCamCalibration->isActive()) {
             int index = 0;
