@@ -175,7 +175,7 @@ void ofApp::setupGUI() {
 
 
     mBGridSelect = ofxDatMatrix::create();
-    mBGridSelect->matrix = new ofxDatGuiMatrix("Grid Matrix", 2 * 2, true);
+    mBGridSelect->matrix = new ofxDatGuiMatrix("Grid Matrix", 1, true);
     mBGridSelect->matrix->setRadioMode(true);
     mBGridSelect->matrix->setOpacity(0.8);
     mBGridSelect->matrix->setWidth(390, .5);

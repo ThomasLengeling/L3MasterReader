@@ -31,7 +31,7 @@ L3
 
 #define RAD_DETECTION 30
 #define MOUSE_RADIUS  17
-#define MAX_MARKERS 106
+#define MAX_MARKERS 250
 
 class GridDetector;
 typedef std::shared_ptr<GridDetector> GridDetectorRef;

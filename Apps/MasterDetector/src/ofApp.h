@@ -36,7 +36,8 @@ enum debugConfiguration {
     GRID_POS = 2,
     DEBUG_COLOR = 3,
     RELEASE = 4,
-    DEBUG = 5
+    DEBUG = 5,
+    SINGLE_MODE = 6
 };
 
 
@@ -56,6 +57,8 @@ public:
     void mousePressed(int x, int y, int button);
     void keyPressed(int key);
     void keyReleased(int key);
+
+    void windowResized(int w, int h);
 
     void offScreenMarkers();
 
@@ -145,6 +148,9 @@ public:
 
     std::vector< std::map<int, int> > mPrevGridArea;
     std::vector< std::map<int, int> > mGridArea;
+
+    std::map<int, int>  mPSGridArea;
+    std::map<int, int>  mSGridArea;
 
     int   spaecialGridInter01[13];
 };

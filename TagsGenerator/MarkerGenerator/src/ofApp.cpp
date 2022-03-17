@@ -8,8 +8,10 @@ void ofApp::setup(){
 	mMakerId = 0;
 	mBorderBits = 1;
 
+	mDictionaryId = 2; //55
 
-	mDictionaryTags.push_back("DICT_4X4_50");
+
+	mDictionaryTags.push_back("DICT_4X4_50"); //0
 	mDictionaryTags.push_back("DICT_4X4_100");
 	mDictionaryTags.push_back("DICT_4X4_250");
 	mDictionaryTags.push_back("DICT_4X4_1000");
@@ -52,7 +54,7 @@ void ofApp::update(){
 	{
 		if(mGenerateTags){
 			for(int i = 0; i < mDictionaryMax.at(mDictionaryId); i++){
-				ofImage img = createMarker(mDictionaryId, i, mBorderBits);
+				mVidImg = createMarker(mDictionaryId, i, mBorderBits);
 				mVidImg.save(mDictionaryTags.at(mDictionaryId)+"/"+to_string(mDictionaryId)+"_"+to_string(i)+".png");
 			}
 			mGenerateTags = false;
@@ -130,9 +132,6 @@ void ofApp::keyPressed(int key){
 		mGenerateTags = true;
 	}
 
-	if(key == 'p'){
-		mVidImg.save(mDictionaryTags.at(mDictionaryId)+"_"+to_string(mMakerId)+".png");
-	}
 
 	if(key == 'd'){
 		mVidImg = createCustomMarker(mMakerId);

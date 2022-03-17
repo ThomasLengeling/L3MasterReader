@@ -18,7 +18,7 @@ void ArucoDetector::resetMinMax() {
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
   float markerLength     = 0.0162;     // 0.0165
   float markerSeparation = 0.0042; // 0045
-  int dictionaryId       = cv::aruco::DICT_4X4_50; //0
+  int dictionaryId       = cv::aruco::DICT_4X4_250; //0
   std::string outputFile = "./cal.txt";
 
   int calibrationFlags = 0;
@@ -27,11 +27,11 @@ void ArucoDetector::setupCalibration(int markersX, int markersY) {
   detectorParams = cv::aruco::DetectorParameters::create();
 
   detectorParams->adaptiveThreshWinSizeMin = 3; //20
-  detectorParams->adaptiveThreshWinSizeMax = 37; //50
+  detectorParams->adaptiveThreshWinSizeMax = 42; //50
   detectorParams->adaptiveThreshWinSizeStep = 4;
 
   detectorParams->perspectiveRemovePixelPerCell = 10; // 10
-  detectorParams->perspectiveRemoveIgnoredMarginPerCell = .04; //.15
+  detectorParams->perspectiveRemoveIgnoredMarginPerCell = .15; //.15
   detectorParams->errorCorrectionRate = 0.3;
   detectorParams->maxErroneousBitsInBorderRate = 0.6;//35
   detectorParams->minOtsuStdDev = 5;//
@@ -40,7 +40,7 @@ void ArucoDetector::setupCalibration(int markersX, int markersY) {
 
   detectorParams->maxErroneousBitsInBorderRate = 15;
 
-  detectorParams->polygonalApproxAccuracyRate = 0.05;//.1
+  detectorParams->polygonalApproxAccuracyRate = 0.1;//.1
 
   //detectorParams->markerBorderBits = 0;
 

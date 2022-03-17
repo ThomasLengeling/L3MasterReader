@@ -21,6 +21,8 @@ void ofApp::setup()
     ofSetVerticalSync(false);
     ofSetFrameRate(30);
     ofSetBackgroundAuto(false);
+
+  
     //ofBackground(0);
 
     //detector
@@ -46,6 +48,11 @@ void ofApp::setup()
 
    // spaecialGridInter01 = {37, 38, 39, 40, 41, 42, 60, 61, 62, 63, 64, 65};
 
+    //init setup
+    mBSingleGrid->setActivation(true);
+    mBFullGrid->setActivation(false);
+    mConfigureMode = SINGLE_MODE;
+    mCurrentCamId = 0;
 }
 
 
@@ -184,8 +191,30 @@ void ofApp::updateUDP() {
         //send a single grid
         if (mGridDetector.at(mCurrentCamId)->isDoneCleaner()) {
             std::string udpMsg = "i ";
-            //udpMsg += mGridDetector.at(mCurrentCamId)->getUDPMsg();
-           // mUDPConnectionTable.Send(udpMsg.c_str(), udpMsg.length());
+
+            std::map<int, int> empthGrid = mGridDetector.at(mCurrentCamId)->getEmptyGrid();
+
+            std::map<int, int> gridInter01 = mGridDetector.at(mCurrentCamId)->getGridInter();
+
+            mPSGridArea = mSGridArea;
+
+            mSGridArea.clear();
+
+            //area 1
+            mSGridArea.insert(empthGrid.begin(), empthGrid.end());
+
+            if (mPSGridArea != mSGridArea) {
+                std::string mUdpMsg = "i1 ";
+                for (auto& gridInter : mSGridArea) {
+                    mUdpMsg += std::to_string(gridInter.second) + " ";
+                }
+                mUDPConnectionTable.Send(mUdpMsg.c_str(), mUdpMsg.length());
+                mUDPConnectionRadar.Send(mUdpMsg.c_str(), mUdpMsg.length());
+                mUDPConnectionGrid.Send(mUdpMsg.c_str(), mUdpMsg.length());
+                ofLog(OF_LOG_NOTICE) << "Msg: " << mUdpMsg;
+            }
+
+
         }
 
         mGridDetector.at(mCurrentCamId)->resetProbabilty();
@@ -309,7 +338,35 @@ void ofApp::offScreenMarkers() {
         mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
     }
         break;
+    case SINGLE_MODE:
+    {
 
+        ofSetColor(255);
+        // mImageDetector.draw(0, 0);
+        float sqsize = 29;
+        float sqspace = 5;
+
+        glm::vec2 dim = mGridDetector.at(mCurrentCamId)->getDim();
+        int spaceX = dim.x * (sqsize + sqspace);
+        int spaceY = dim.y * (sqsize + sqspace);
+
+
+        //cut RIO
+        int camWidth = mCamGrabber.at(mCurrentCamId)->getROI().width;
+
+        //mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
+
+        //mBaseGrid.draw(0, 0);
+        glm::vec2 pos(500, 280);
+        mGridDetector.at(mCurrentCamId)->drawDetectedInteraction(0, pos.x, pos.y, sqsize, sqspace);
+
+
+        ofSetColor(225);
+        ofDrawRectangle(0, 0, 1920, 240);
+
+        mCamGrabber.at(mCurrentCamId)->drawImage(480, 0, 480, 270);
+    }
+        break;
     case RELEASE:
     {
         //draw grids
@@ -396,6 +453,9 @@ void ofApp::draw()
 
         mFboSingle.draw(0, 0);
         break;
+    case SINGLE_MODE:
+
+
     case RELEASE:
 
 
@@ -404,9 +464,6 @@ void ofApp::draw()
         mImageDetector.draw(0, 640, 640, 360);
 
         mFboSingle.draw(0, 0);
-
-
-
 
         ofSetColor(225);
         ofDrawRectangle(0, 1080 - 230, 1920, 1080);
@@ -442,7 +499,7 @@ void ofApp::draw()
             i++;
         }
     }
-    ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1750, 950);
+    //ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1750, 950);
 
 
     
@@ -520,6 +577,11 @@ void ofApp::keyReleased(int key)
         ofLog(OF_LOG_NOTICE) << mCamGrabber.at(mCurrentCamId)->getGamma() << std::endl;
         break;
     case '5':
+        mBSingleGrid->setActivation(true);
+        mBFullGrid->setActivation(false);
+        mConfigureMode = SINGLE_MODE;
+        break;
+    case '6':
         mBSingleGrid->setActivation(false);
         mBFullGrid->setActivation(true);
         mConfigureMode = RELEASE;
@@ -535,7 +597,7 @@ void ofApp::keyReleased(int key)
         break;
 
     case 't':
-                 
+        ofSetWindowShape(1920, 1080);
         break;
 
     case 'r':
@@ -600,8 +662,11 @@ void ofApp::keyReleased(int key)
         break;
     } 
 
+}
 
-
+void ofApp::windowResized(int w, int h) {
+  //  ofSetWindowShape(1920, 1080);
+    ofLog(OF_LOG_NOTICE) << "Changed Size" << std::endl;
 }
 
 //--------------------------------------------------------------
@@ -659,6 +724,7 @@ void ofApp::drawGUI() {
         break;
     case DEBUG:
     case RELEASE:
+    case SINGLE_MODE:
     case INPUT_IMG:
         mBSingleGrid->draw();
         mBFullGrid->draw();
@@ -679,6 +745,7 @@ void ofApp::updateGUI() {
 
     case DEBUG:
     case RELEASE:
+    case SINGLE_MODE:
     case INPUT_IMG:
         mBSingleGrid->update();
         mBFullGrid->update();
