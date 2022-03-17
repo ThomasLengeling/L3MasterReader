@@ -21,34 +21,71 @@ void ArucoDetector::generateDetectorParams() {
     ofLog(OF_LOG_NOTICE) << "Loading Dectector Params: ";
     ofFile file("camera_config.json");
     if (file.exists()) {
-        ofJson detectorParams;
-        file >> detectorParams;
+        ofJson  jsParams;
+        file >> jsParams;
 
-        double adaptiveThreshConstant       = detectorParams["camera"]["adaptiveThreshConstant"].get<double>();
-        int adaptiveThreshWinSizeMax        = detectorParams["camera"]["adaptiveThreshWinSizeMax"].get<int>();
-        int adaptiveThreshWinSizeMin        = detectorParams["camera"]["adaptiveThreshWinSizeMin"].get<int>();
-        int adaptiveThreshWinSizeStep       = detectorParams["camera"]["adaptiveThreshWinSizeStep"].get<int>();
+        double adaptiveThreshConstant       = jsParams["camera"]["adaptiveThreshConstant"].get<double>();
+        int adaptiveThreshWinSizeMax        = jsParams["camera"]["adaptiveThreshWinSizeMax"].get<int>();
+        int adaptiveThreshWinSizeMin        = jsParams["camera"]["adaptiveThreshWinSizeMin"].get<int>();
+        int adaptiveThreshWinSizeStep       = jsParams["camera"]["adaptiveThreshWinSizeStep"].get<int>();
         
-        int cornerRefinementMaxIterations   = detectorParams["camera"]["cornerRefinementMaxIterations"].get<int>();
-        double cornerRefinementMinAccuracy  = detectorParams["camera"]["cornerRefinementMinAccuracy"].get<double>();
-        int cornerRefinementWinSize         = detectorParams["camera"]["cornerRefinementWinSize"].get<int>();
+        int cornerRefinementMaxIterations   = jsParams["camera"]["cornerRefinementMaxIterations"].get<int>();
+        double cornerRefinementMinAccuracy  = jsParams["camera"]["cornerRefinementMinAccuracy"].get<double>();
+        int cornerRefinementWinSize         = jsParams["camera"]["cornerRefinementWinSize"].get<int>();
         
-        double errorCorrectionRate          =  detectorParams["camera"]["errorCorrectionRate"].get<double>();
-        int markerBorderBits                = detectorParams["camera"]["markerBorderBits"].get<int>();
-        double maxErroneousBitsInBorderRate = detectorParams["camera"]["maxErroneousBitsInBorderRate"].get<double>();
+        double errorCorrectionRate          = jsParams["camera"]["errorCorrectionRate"].get<double>();
+        int markerBorderBits                = jsParams["camera"]["markerBorderBits"].get<int>();
+        double maxErroneousBitsInBorderRate = jsParams["camera"]["maxErroneousBitsInBorderRate"].get<double>();
 
-        double maxMarkerPerimeterRate  = detectorParams["camera"]["maxMarkerPerimeterRate"].get<double>();
-        double minCornerDistanceRate   = detectorParams["camera"]["minCornerDistanceRate"].get<double>();
-        int minDistanceToBorder        = detectorParams["camera"]["minDistanceToBorder"].get<int>();
+        double maxMarkerPerimeterRate  = jsParams["camera"]["maxMarkerPerimeterRate"].get<double>();
+        double minCornerDistanceRate   = jsParams["camera"]["minCornerDistanceRate"].get<double>();
+        int minDistanceToBorder        = jsParams["camera"]["minDistanceToBorder"].get<int>();
 
-        double minMarkerDistanceRate   = detectorParams["camera"]["minMarkerDistanceRate"].get<double>();
-        double minMarkerPerimeterRate  = detectorParams["camera"]["minMarkerPerimeterRate"].get<double>();
+        double minMarkerDistanceRate   = jsParams["camera"]["minMarkerDistanceRate"].get<double>();
+        double minMarkerPerimeterRate  = jsParams["camera"]["minMarkerPerimeterRate"].get<double>();
 
-        int minOtsuStdDev              = detectorParams["camera"]["minOtsuStdDev"].get<double>();
+        double minOtsuStdDev              = jsParams["camera"]["minOtsuStdDev"].get<double>();
 
-        double perspectiveRemoveIgnoredMarginPerCell = detectorParams["camera"]["perspectiveRemoveIgnoredMarginPerCell"].get<double>();
-        int perspectiveRemovePixelPerCell            = detectorParams["camera"]["perspectiveRemovePixelPerCell"].get<int>();
-        double polygonalApproxAccuracyRate           = detectorParams["camera"]["polygonalApproxAccuracyRate"].get<double>();
+        double perspectiveRemoveIgnoredMarginPerCell = jsParams["camera"]["perspectiveRemoveIgnoredMarginPerCell"].get<double>();
+        int perspectiveRemovePixelPerCell            = jsParams["camera"]["perspectiveRemovePixelPerCell"].get<int>();
+        double polygonalApproxAccuracyRate           = jsParams["camera"]["polygonalApproxAccuracyRate"].get<double>();
+
+
+
+        int dictionaryId = cv::aruco::DICT_4X4_250; //0
+        detectorParams = cv::aruco::DetectorParameters::create();
+
+        detectorParams->adaptiveThreshConstant = adaptiveThreshConstant;
+        detectorParams->adaptiveThreshWinSizeMax = adaptiveThreshWinSizeMax;
+        detectorParams->adaptiveThreshWinSizeMin = adaptiveThreshWinSizeMin;
+        detectorParams->adaptiveThreshWinSizeStep = adaptiveThreshWinSizeStep;
+
+        detectorParams->cornerRefinementMaxIterations = cornerRefinementMaxIterations;
+        detectorParams->cornerRefinementMinAccuracy = cornerRefinementMinAccuracy;
+        detectorParams->cornerRefinementWinSize = cornerRefinementWinSize;
+
+        detectorParams->errorCorrectionRate = errorCorrectionRate;
+        detectorParams->markerBorderBits = markerBorderBits;
+        detectorParams->maxErroneousBitsInBorderRate = maxErroneousBitsInBorderRate;
+
+        detectorParams->maxMarkerPerimeterRate = maxMarkerPerimeterRate;
+        detectorParams->minCornerDistanceRate = minCornerDistanceRate;
+        detectorParams->minDistanceToBorder = minDistanceToBorder;
+
+        detectorParams->minMarkerDistanceRate = minMarkerDistanceRate;
+        detectorParams->minMarkerPerimeterRate = minMarkerPerimeterRate;
+
+        detectorParams->minOtsuStdDev = minOtsuStdDev;
+
+        detectorParams->perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell;
+        detectorParams->perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell;
+        detectorParams->polygonalApproxAccuracyRate = polygonalApproxAccuracyRate;
+
+
+        //pedfine marker
+     
+        dictionary = cv::aruco::getPredefinedDictionary(
+            cv::aruco::PREDEFINED_DICTIONARY_NAME(dictionaryId));
 
     }
     else {
@@ -65,7 +102,7 @@ https://docs.opencv.org/4.5.5/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.htm
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
   float markerLength     = 0.0162;     // 0.0165
   float markerSeparation = 0.0042; // 0045
-  int dictionaryId       = cv::aruco::DICT_4X4_50; //0
+  int dictionaryId       = cv::aruco::DICT_4X4_250; //0
   std::string outputFile = "./cal.txt";
 
   int calibrationFlags = 0;
