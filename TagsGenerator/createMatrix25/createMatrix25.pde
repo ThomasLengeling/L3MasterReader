@@ -4,8 +4,8 @@ import processing.pdf.*;
 ControlP5 cp5;
 
 
-int numRows = 4;
-int numColums = 3;
+int numRows = 15;
+int numColums = 15;
 
 int spaceX = 7;
 int spaceY = 7;
@@ -25,14 +25,14 @@ boolean record = false;
 int startIndex = 0;
 int id =0;
 
-String makerType = "DICT_4X4_50";
-int opencvId = 0;
+String makerType = "DICT_4X4_250";
+int opencvId = 2;
 
 //12 markers
-int ids [] = {3, 10, 13, 17, 22, 30, 34, 37, 38, 40, 41, 49};
+//int ids [] = {3, 10, 13, 17, 22, 30, 34, 37, 38, 40, 41, 49};
 
 void setup() {
-  size(1280, 1200);
+  size(1920, 1080);
 
   testGrid = loadImage("test_grid.png");
 
@@ -42,7 +42,7 @@ void setup() {
   for (int  i = 0; i < numRows; i++) {
     for (int j = 0; j < numColums; j++) {
       int index = i * numColums + j + startIndex;
-      String path = makerType+"/"+opencvId+" "+ids[index]+".png";
+      String path = makerType+"/"+opencvId+"_"+index+".png";
       PImage image = loadImage(path);
       println(path);
       arucoImages.add(image);
@@ -60,14 +60,14 @@ void setup() {
     .setPosition(50, 50)
     .setSize(200, 20)
     .setRange(0, 100)
-    .setValue(82) //72
+    .setValue(400) //72
     ;
 
   cp5.addSlider("startY")
     .setPosition(50, 80)
     .setSize(200, 20)
     .setRange(0, 100)
-    .setValue(32) //32
+    .setValue(20) //32
     ;
 
 
@@ -75,28 +75,28 @@ void setup() {
     .setPosition(50, 110)
     .setSize(200, 20)
     .setRange(0, 200)
-    .setValue(166.5) //184.5
+    .setValue(60) //184.5
     ;
 
   cp5.addSlider("tamY")
     .setPosition(50, 140)
     .setSize(200, 20)
     .setRange(0, 200)
-    .setValue(166.5) //184.5
+    .setValue(60) //184.5
     ;
 
   cp5.addSlider("spaceX")
     .setPosition(50, 170)
     .setSize(200, 20)
     .setRange(0, 300)
-    .setValue(236.5)
+    .setValue(70)
     ;
 
   cp5.addSlider("spaceY")
     .setPosition(50, 200)
     .setSize(200, 20)
     .setRange(0, 300)
-    .setValue(236.5)
+    .setValue(70)
     ;
 }
 
@@ -105,12 +105,13 @@ void draw() {
   if (record) {
     // Note that #### will be replaced with the frame number. Fancy!
     beginRecord(PDF, "frame_"+startIndex+"_.pdf");
+    
   }
 
 
   background(255);
 
-  image(testGrid, 0, 0);
+ // image(testGrid, 0, 0);
   
 
 
@@ -121,7 +122,7 @@ void draw() {
 
       float x =  spaceX*i + startX;
       float y =  spaceY*j + startY;
-      image(im, x, y + spaceY, tamX, tamY);
+      image(im, x, y, tamX, tamY);
       
       fill(0);
       textSize(16);
@@ -136,6 +137,7 @@ void draw() {
   if (record) {
     endRecord();
     record = false;
+     save("frame_"+startIndex+".png");
     println("finished writing");
   }
 }

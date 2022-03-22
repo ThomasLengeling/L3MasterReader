@@ -36,6 +36,10 @@ void ofApp::setupValues() {
         ofLog(OF_LOG_NOTICE) << "Error Base Interactive Img";
     }
 
+    //Perspective
+    mPerspectiveIndex = 0;
+    mPerspInc = glm::vec2(0, 0);
+
 }
 
 void ofApp::setupGridInfo() {
@@ -276,6 +280,20 @@ void ofApp::setupCams() {
                     float gamma = cam[inputImg]["gamma"].get<float>();
                     float alpha = cam[inputImg]["alpha"].get<float>();
                     float beta  = cam[inputImg]["beta"].get<float>();
+
+                    //perspective
+                    glm::vec2 inputQuad0 = glm::vec2(cam[inputImg]["px0"], cam[inputImg]["py0"]);
+                    glm::vec2 inputQuad1 = glm::vec2(cam[inputImg]["px1"], cam[inputImg]["py1"]);
+                    glm::vec2 inputQuad2 = glm::vec2(cam[inputImg]["px2"], cam[inputImg]["py2"]);
+                    glm::vec2 inputQuad3 = glm::vec2(cam[inputImg]["px3"], cam[inputImg]["py3"]);
+
+                    mCamGrabber.at(j)->setInputPersp(inputQuad0, 0);
+                    mCamGrabber.at(j)->setInputPersp(inputQuad1, 1);
+                    mCamGrabber.at(j)->setInputPersp(inputQuad2, 2);
+                    mCamGrabber.at(j)->setInputPersp(inputQuad3, 3);
+
+                    mCamGrabber.at(j)->resetPerspective();
+                    //mCamGrabber.at(j)->enablePerspective();
                     
 
                     mCamGrabber.at(j)->setGamma(gamma);

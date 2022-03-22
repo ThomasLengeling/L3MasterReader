@@ -37,7 +37,8 @@ enum debugConfiguration {
     DEBUG_COLOR = 3,
     RELEASE = 4,
     DEBUG = 5,
-    SINGLE_MODE = 6
+    SINGLE_MODE = 6,
+    PERSPECTIVE_IMG = 7
 };
 
 
@@ -52,6 +53,7 @@ public:
 	void draw();
     void exit();
 
+    void mouseMoved(int x, int y);
     void mouseDragged(int x, int y, int button);
     void mouseReleased(int x, int y, int button);
     void mousePressed(int x, int y, int button);
@@ -153,4 +155,11 @@ public:
     std::map<int, int>  mSGridArea;
 
     int   spaecialGridInter01[13];
+
+    //perspective
+    glm::vec2     mPerspInc;
+    int           mPerspectiveIndex;
+    glm::vec2     mCurretPerspInc;
+
+    glm::vec2     mMousePos;
 };

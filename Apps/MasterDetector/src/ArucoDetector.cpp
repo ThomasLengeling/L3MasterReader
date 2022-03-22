@@ -10,6 +10,83 @@ ArucoDetector::ArucoDetector() {
   mNumFoundMarkers = 0;
 }
 
+void ArucoDetector::generateDetectorParams() {
+    ofLog(OF_LOG_NOTICE) << "Loading Dectector Params: ";
+    ofFile file("camera_config.json");
+    if (file.exists()) {
+        ofJson  jsParams;
+        file >> jsParams;
+
+        double adaptiveThreshConstant = jsParams["camera"]["adaptiveThreshConstant"].get<double>();
+        int adaptiveThreshWinSizeMax = jsParams["camera"]["adaptiveThreshWinSizeMax"].get<int>();
+        int adaptiveThreshWinSizeMin = jsParams["camera"]["adaptiveThreshWinSizeMin"].get<int>();
+        int adaptiveThreshWinSizeStep = jsParams["camera"]["adaptiveThreshWinSizeStep"].get<int>();
+
+        int cornerRefinementMaxIterations = jsParams["camera"]["cornerRefinementMaxIterations"].get<int>();
+        double cornerRefinementMinAccuracy = jsParams["camera"]["cornerRefinementMinAccuracy"].get<double>();
+        int cornerRefinementWinSize = jsParams["camera"]["cornerRefinementWinSize"].get<int>();
+
+        double errorCorrectionRate = jsParams["camera"]["errorCorrectionRate"].get<double>();
+        int markerBorderBits = jsParams["camera"]["markerBorderBits"].get<int>();
+        double maxErroneousBitsInBorderRate = jsParams["camera"]["maxErroneousBitsInBorderRate"].get<double>();
+
+        double maxMarkerPerimeterRate = jsParams["camera"]["maxMarkerPerimeterRate"].get<double>();
+        double minCornerDistanceRate = jsParams["camera"]["minCornerDistanceRate"].get<double>();
+        int minDistanceToBorder = jsParams["camera"]["minDistanceToBorder"].get<int>();
+
+        double minMarkerDistanceRate = jsParams["camera"]["minMarkerDistanceRate"].get<double>();
+        double minMarkerPerimeterRate = jsParams["camera"]["minMarkerPerimeterRate"].get<double>();
+
+        double minOtsuStdDev = jsParams["camera"]["minOtsuStdDev"].get<double>();
+
+        double perspectiveRemoveIgnoredMarginPerCell = jsParams["camera"]["perspectiveRemoveIgnoredMarginPerCell"].get<double>();
+        int perspectiveRemovePixelPerCell = jsParams["camera"]["perspectiveRemovePixelPerCell"].get<int>();
+        double polygonalApproxAccuracyRate = jsParams["camera"]["polygonalApproxAccuracyRate"].get<double>();
+
+
+
+        int dictionaryId = cv::aruco::DICT_4X4_250; //0
+        detectorParams = cv::aruco::DetectorParameters::create();
+
+        detectorParams->adaptiveThreshConstant = adaptiveThreshConstant;
+        detectorParams->adaptiveThreshWinSizeMax = adaptiveThreshWinSizeMax;
+        detectorParams->adaptiveThreshWinSizeMin = adaptiveThreshWinSizeMin;
+        detectorParams->adaptiveThreshWinSizeStep = adaptiveThreshWinSizeStep;
+
+        detectorParams->cornerRefinementMaxIterations = cornerRefinementMaxIterations;
+        detectorParams->cornerRefinementMinAccuracy = cornerRefinementMinAccuracy;
+        detectorParams->cornerRefinementWinSize = cornerRefinementWinSize;
+
+        detectorParams->errorCorrectionRate = errorCorrectionRate;
+        detectorParams->markerBorderBits = markerBorderBits;
+        detectorParams->maxErroneousBitsInBorderRate = maxErroneousBitsInBorderRate;
+
+        detectorParams->maxMarkerPerimeterRate = maxMarkerPerimeterRate;
+        detectorParams->minCornerDistanceRate = minCornerDistanceRate;
+        detectorParams->minDistanceToBorder = minDistanceToBorder;
+
+        detectorParams->minMarkerDistanceRate = minMarkerDistanceRate;
+        detectorParams->minMarkerPerimeterRate = minMarkerPerimeterRate;
+
+        detectorParams->minOtsuStdDev = minOtsuStdDev;
+
+        detectorParams->perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell;
+        detectorParams->perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell;
+        detectorParams->polygonalApproxAccuracyRate = polygonalApproxAccuracyRate;
+
+
+        //pedfine marker
+
+        dictionary = cv::aruco::getPredefinedDictionary(
+            cv::aruco::PREDEFINED_DICTIONARY_NAME(dictionaryId));
+
+    }
+    else {
+        ofLog(OF_LOG_NOTICE) << "cannot find file, creating default paramas";
+    }
+}
+
+
 void ArucoDetector::resetMinMax() {
   mMinFoundId = 100;
   mMaxFoundId = 0;

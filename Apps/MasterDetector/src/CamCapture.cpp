@@ -29,6 +29,14 @@ CamCapture::CamCapture(glm::vec2 dims) {
   mFboResolution.begin();
   ofClear(0, 0, 0, 255);
   mFboResolution.end();
+
+  //perspective
+  cornerIndex = 0;
+  mCalculatedPerspec = false;
+  mInputQuad[0] = cv::Point2f(20, 20);
+  mInputQuad[1] = cv::Point2f(700, 20);
+  mInputQuad[2] = cv::Point2f(700, 800);
+  mInputQuad[3] = cv::Point2f(20, 800);
 }
 
 //-----------------------------------------------------------------------------
@@ -224,40 +232,84 @@ void CamCapture::drawCropImg() {
 }
 
 //-----------------------------------------------------------------------------
-void CamCapture::updateCorners(){
+void CamCapture::drawPerspectiveImg() {
+    ofImage imgPerspec;
+    ofxCv::toOf(mPerspectiveMat, imgPerspec.getPixels());
+    imgPerspec.update();
 
-  //update corners
-  //mInputQuad[0]
-  //mInputQuad[1]
-  //mInputQuad[2]
-  //mInputQuad[3]
+    imgPerspec.draw(0, 0);
 }
 
-//
-void CamCapture::calculatePerspective(){
+//-----------------------------------------------------------------------------
+void CamCapture::updateCorners(glm::vec2 corner) {
+    //Input Quadilateral or Image plane coordinates
+    mInputQuad[cornerIndex] = cv::Point2f(corner.x, corner.y);
+    ofLog(OF_LOG_NOTICE) << "added point " << cornerIndex << " " << corner.x << ", " << corner.y << std::endl;
 
-  //mCropMat
-  // Input Quadilateral or Image plane coordinates
-   Point2f inputQuad[4];
+    cornerIndex++;
+    if (cornerIndex >= 4) {
+        cornerIndex = 0;
+        ofLog(OF_LOG_NOTICE) << "new calculated perspective done";
+        mCalculatedPerspec = true;
+    }
+}
+//-----------------------------------------------------------------------------
+void CamCapture::calculatePerspective(cv::Mat& inputVideo) {
+    // Output Quadilateral or World plane coordinates
+    ofPoint tl(mInputQuad[0].x, mInputQuad[0].y);
+    ofPoint tr(mInputQuad[1].x, mInputQuad[1].y);
+    ofPoint br(mInputQuad[2].x, mInputQuad[2].y);
+    ofPoint bl(mInputQuad[3].x, mInputQuad[3].y);
 
-   inputQuad[0] = Point2f(0, 0);
-   inputQuad[1] = Point2f(0, 0);
-   inputQuad[2] = Point2f(0, 0);
-   inputQuad[3] = Point2f(0, 0);
+    float widthA = sqrt(pow(br.x - bl.x, 2) + pow(br.y - bl.y, 2));
+    float widthB = sqrt(pow(tr.x - tl.x, 2) + pow(tr.y - tl.y, 2));
+    float maxWidth = glm::max(widthA, widthB);
 
-   // Output Quadilateral or World plane coordinates
-   Point2f outputQuad[4];
-   outputQuad[0] = Point2f(0, 0);
-   outputQuad[1] = Point2f(0, 0);
-   outputQuad[2] = Point2f(0, 0);
-   outputQuad[3] = Point2f(0, 0);
+    float heightA = sqrt(pow(tr.x - br.x, 2) + pow(tr.y - br.y, 2));
+    float heightB = sqrt(pow(tl.x - bl.x, 2) + pow(tl.y - bl.y, 2));
+    float maxHeight = glm::max(heightA, heightB);
 
-   // Lambda Matrix
-   Mat lambda;
-   lambda = getPerspectiveTransform( inputQuad, outputQuad );
+    cv::Point2f outputQuad[4];
+    outputQuad[0] = cv::Point2f(0, 0);
+    outputQuad[1] = cv::Point2f(maxWidth - 1, 0);
+    outputQuad[2] = cv::Point2f(maxWidth - 1, maxHeight - 1);
+    outputQuad[3] = cv::Point2f(0, maxHeight - 1);
 
-   // Apply the Perspective Transform just found to the src image
-   warpPerspective(mCropMat, mPerspectiveMat, lambda, mPerspectiveMat.size());
+    mPrespecDim.x = maxWidth;
+    mPrespecDim.y = maxHeight;
 
-   //
+
+    //ofLog(OF_LOG_NOTICE) << "Perspective " << mPrespecDim.x << " " << mPrespecDim.y<< std::endl;
+
+    // Lambda Matrix
+    Mat lambda = getPerspectiveTransform(mInputQuad, outputQuad);
+    cv::Size matSize(maxWidth, maxHeight);
+
+    // Apply the Perspective Transform just found to the src image
+    warpPerspective(inputVideo, mPerspectiveMat, lambda, matSize);
+}
+//-----------------------------------------------------------------------------
+void CamCapture::setInputPersp(glm::vec2 pos, int index) {
+    mInputQuad[index] = cv::Point2f(pos.x, pos.y);
+}
+//-----------------------------------------------------------------------------
+void CamCapture::addInputPersp(glm::vec2 point, int index) {
+    mInputQuad[index] += cv::Point2f(point.x, point.y);
+    ofLog(OF_LOG_NOTICE) << "set point " << index << " " << mInputQuad[index].x << " " << mInputQuad[index].y;
+}
+
+//-----------------------------------------------------------------------------
+glm::vec2 CamCapture::getInputPersp(int index) {
+    return glm::vec2(mInputQuad[index].x, mInputQuad[index].y);
+}
+
+//-----------------------------------------------------------------------------
+void CamCapture::resetPerspective() {
+    mCalculatedPerspec = true;
+    cornerIndex = 0;
+
+    mInputQuad[0] = cv::Point2f(0, 0);
+    mInputQuad[1] = cv::Point2f(mDim.x - 1, 0);
+    mInputQuad[2] = cv::Point2f(mDim.x - 1, mDim.y - 1);
+    mInputQuad[3] = cv::Point2f(0, mDim.y - 1);
 }
