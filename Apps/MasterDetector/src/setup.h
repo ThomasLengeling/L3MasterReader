@@ -292,8 +292,8 @@ void ofApp::setupCams() {
                     mCamGrabber.at(j)->setInputPersp(inputQuad2, 2);
                     mCamGrabber.at(j)->setInputPersp(inputQuad3, 3);
 
-                    mCamGrabber.at(j)->resetPerspective();
-                    //mCamGrabber.at(j)->enablePerspective();
+                    //mCamGrabber.at(j)->resetPerspective();
+                    mCamGrabber.at(j)->enablePerspective();
                     
 
                     mCamGrabber.at(j)->setGamma(gamma);
