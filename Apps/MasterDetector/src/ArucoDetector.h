@@ -57,11 +57,28 @@ public:
     int getMinId(){return mMinFoundId;}
     int getMaxId(){return mMaxFoundId;}
 
-    void calibrateCamera();
+
 
     void generateDetectorParams();
 
     //calibration
+
+    void toggleCalibration(bool value = true) {
+        calibrationProcess = value;
+    }
+
+    void captureCalibrate() {
+        captureFrame = true;
+    }
+    int getCalibrationCount() { return captureCount; }
+  
+
+    void calibrateCameraProcess();
+
+    void resetCalibration();
+
+    void loadCalibration();
+
     bool readDetectorParameters(std::string filename, cv::Ptr< cv::aruco::DetectorParameters> & params);
     
     bool saveCameraParams(const std::string &filename, cv::Size imageSize,
@@ -69,6 +86,7 @@ public:
                          const cv::Mat & cameraMatrix, const cv::Mat & distCoeffs,
                          double totalAvgErr);
 
+    bool readCameraParameters(std::string filename, cv::Mat& camMatrix, cv::Mat& distCoeffs);
 private:
 
     //qr aruco
@@ -91,5 +109,24 @@ private:
     ofImage mVidImg;
 
     bool mMarkerInfo;
+
+    //calibration camera
+    bool calibrationProcess;
+    bool captureFrame;
+
+    bool calibratedCam;
+
+    bool useCalibration;
+    int  captureCount;
+
+    vector < vector < vector < cv::Point2f > > > caliAllCorners;
+    vector< vector< int > > caliAllIds;
+
+
+    cv::Size imgSize;
+    int calibrationFlags;
+
+    cv::Mat cameraMatrix;
+    cv::Mat distCoeffs;
 
 };

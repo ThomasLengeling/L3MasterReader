@@ -226,18 +226,17 @@ void ofApp::setupGUI() {
 }
 //-----------------------------------------------------------------------------
 void ofApp::setupArucoDetector() {
-    for (int i = 0; i < NUM_CAM_INPUTS; i++) {
-        ArucoDetectorRef detector = ArucoDetector::create();
-        detector->setupCalibration(mGridSizes.at(i).x, mGridSizes.at(i).y);
-        mArucoDetector.push_back(detector);
-    }
+    mArucoDetector = ArucoDetector::create(); //mGridSizes.at(i).x, mGridSizes.at(i).y);
+    mArucoDetector->setupCalibration(10, 10);// mGridSizes.at(0).x, mGridSizes.at(0).y);
 
-    ofLog(OF_LOG_NOTICE) << "done setup detector: " << mArucoDetector.size();
+    ofLog(OF_LOG_NOTICE) << "done setup detector: ";
 }
 
 //-----------------------------------------------------------------------------
 void ofApp::setupCamCalibration() {
 
+    mArucoDetector->toggleCalibration(true);
+    mConfigureMode = CAMERA_CALIBRATION;
     ofLog(OF_LOG_NOTICE) << "done setup calibration";
 }
 

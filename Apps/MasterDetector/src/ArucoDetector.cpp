@@ -8,6 +8,11 @@ ArucoDetector::ArucoDetector() {
   mMaxFoundId = 0;
   mMarkerInfo = true;
   mNumFoundMarkers = 0;
+
+  resetCalibration();
+  cameraMatrix = 0;
+  distCoeffs = 0;
+
 }
 
 void ArucoDetector::generateDetectorParams() {
@@ -45,7 +50,7 @@ void ArucoDetector::generateDetectorParams() {
 
 
 
-        int dictionaryId = cv::aruco::DICT_4X4_250; //0
+       // int dictionaryId = cv::aruco::DICT_4X4_1000; //0
         detectorParams = cv::aruco::DetectorParameters::create();
 
         detectorParams->adaptiveThreshConstant = adaptiveThreshConstant;
@@ -77,8 +82,8 @@ void ArucoDetector::generateDetectorParams() {
 
         //pedfine marker
 
-        dictionary = cv::aruco::getPredefinedDictionary(
-            cv::aruco::PREDEFINED_DICTIONARY_NAME(dictionaryId));
+       // dictionary = cv::aruco::getPredefinedDictionary(
+       //     cv::aruco::PREDEFINED_DICTIONARY_NAME(dictionaryId));
 
     }
     else {
@@ -88,14 +93,14 @@ void ArucoDetector::generateDetectorParams() {
 
 
 void ArucoDetector::resetMinMax() {
-  mMinFoundId = 100;
+  mMinFoundId = 1000;
   mMaxFoundId = 0;
 }
 
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
-  float markerLength     = 0.0162;     // 0.0165
-  float markerSeparation = 0.0042; // 0045
-  int dictionaryId       = cv::aruco::DICT_4X4_250; //0
+  float markerLength     = 0.03;     // 0.0165
+  float markerSeparation = 0.007; // 0045
+  int dictionaryId       = cv::aruco::DICT_4X4_1000; //0
   std::string outputFile = "./cal.txt";
 
   int calibrationFlags = 0;
@@ -152,16 +157,32 @@ void ArucoDetector::detectMarkers(cv::Mat &inputVideo, bool refiment) {
 
   // ofxCv::imitate(input, inputVideo);
 
-  aruco::detectMarkers(input, dictionary, corners, arucoIds, detectorParams);
-  // if (refiment) {
-  //aruco::refineDetectedMarkers(input, board, corners, arucoIds, rejected);
-  //}
+  if (useCalibration) {
+      aruco::detectMarkers(input, dictionary, corners, arucoIds, detectorParams, rejected, cameraMatrix, distCoeffs);
+  }
+  else {
+      aruco::detectMarkers(input, dictionary, corners, arucoIds, detectorParams);
+  }
+  if (refiment) {
+       //aruco::refineDetectedMarkers(input, board, corners, arucoIds, rejected);
+  }
 
   if (arucoIds.size() > 0) {
 
-    if (mMarkerInfo) {
-      aruco::drawDetectedMarkers(input, corners, arucoIds);
-    }
+      if (mMarkerInfo) {
+          aruco::drawDetectedMarkers(input, corners, arucoIds);
+      }
+
+      if (useCalibration) {
+          std::vector<cv::Vec3d> rvecs, tvecs;
+          cv::aruco::estimatePoseSingleMarkers(corners, 0.03, cameraMatrix, distCoeffs, rvecs, tvecs);
+
+          for (int i = 0; i < arucoIds.size(); i++) {
+              cv::drawFrameAxes(input, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.02);
+          }
+      }
+    // draw axis for each marker
+ 
     InputArrayOfArrays cornersDetected = corners;
     InputArray idsDetected = arucoIds;
 
@@ -202,16 +223,103 @@ void ArucoDetector::detectMarkers(cv::Mat &inputVideo, bool refiment) {
    // ofLog(OF_LOG_NOTICE) << "non size Aruco detector";
   }
 
+
+  //calibration
+  if (calibrationProcess) {
+      // collected frames for calibration
+
+      if (captureFrame) {
+          if (arucoIds.size() > 0) {
+              cout << "Frame captured" << endl;
+              caliAllCorners.push_back(corners);
+              caliAllIds.push_back(arucoIds);
+              imgSize = input.size();
+              captureFrame = false;
+              captureCount++;
+          }
+      }
+  }
+
   // create video output
   input.copyTo(mVidMat);
   ofxCv::toOf(mVidMat, mVidImg.getPixels());
   mVidImg.update();
 }
+//--------------------------------------------------------------
+void ArucoDetector::resetCalibration() {
+    caliAllCorners.clear();
+    caliAllIds.clear();
 
+    calibrationFlags = 0;
+    useCalibration = false;
+    captureFrame = false;
+    calibrationProcess = false;
+
+
+    captureCount = 0;
+}
+
+//--------------------------------------------------------------
 //calibrate Camera sequence
-void ArucoDetector::calibrateCamera(){
+void ArucoDetector::calibrateCameraProcess(){
+    if (captureCount > 30) {
+        std::vector< cv::Mat > rvecs, tvecs;
+        double repError;
+        float aspectRatio = 1;
 
 
+
+          if (calibrationFlags & CALIB_FIX_ASPECT_RATIO) {
+              cameraMatrix = Mat::eye(3, 3, CV_64F);
+              cameraMatrix.at< double >(0, 0) = aspectRatio;
+          }
+          
+          calibrationFlags |= CALIB_ZERO_TANGENT_DIST;
+
+          // prepare data for calibration
+        vector< vector< Point2f > > allCornersConcatenated;
+        vector< int > allIdsConcatenated;
+        vector< int > markerCounterPerFrame;
+        markerCounterPerFrame.reserve(caliAllCorners.size());
+        for (unsigned int i = 0; i < caliAllCorners.size(); i++) {
+            markerCounterPerFrame.push_back((int)caliAllCorners[i].size());
+            for (unsigned int j = 0; j < caliAllCorners[i].size(); j++) {
+                allCornersConcatenated.push_back(caliAllCorners[i][j]);
+                allIdsConcatenated.push_back(caliAllIds[i][j]);
+            }
+        }
+
+        // calibrate camera
+        repError = aruco::calibrateCameraAruco(allCornersConcatenated, allIdsConcatenated,
+            markerCounterPerFrame, board, imgSize, cameraMatrix,
+            distCoeffs, rvecs, tvecs, calibrationFlags);
+
+        //float aspectRatio = 1;
+
+        string outputFile = ofToDataPath("aruco_calibration.yml");
+
+        bool saveOk = saveCameraParams(outputFile, imgSize, aspectRatio, calibrationFlags, cameraMatrix,
+            distCoeffs, repError);
+       
+        resetCalibration();
+
+        useCalibration = true;
+    }
+
+}
+//--------------------------------------------------------------
+void ArucoDetector::loadCalibration() {
+    
+    string readFile = ofToDataPath("aruco_calibration.yml");
+    bool readOk = readCameraParameters(readFile, cameraMatrix, distCoeffs);
+    
+    if (!readOk) {
+        ofLog(OF_LOG_NOTICE) << "cannot find file for Cam Matrix";
+    }
+    else {
+        ofLog(OF_LOG_NOTICE) << "Read Calibration for Cam Matrix";
+        useCalibration = true;
+    }
 }
 
 // Calibrate
@@ -286,4 +394,13 @@ bool ArucoDetector::saveCameraParams(const std::string &filename,
   fs << "avg_reprojection_error" << totalAvgErr;
 
   return true;
+}
+
+bool ArucoDetector::readCameraParameters(std::string filename, cv::Mat& camMatrix, cv::Mat& distCoeffs) {
+    cv::FileStorage fs(filename, cv::FileStorage::READ);
+    if (!fs.isOpened())
+        return false;
+    fs["camera_matrix"] >> camMatrix;
+    fs["distortion_coefficients"] >> distCoeffs;
+    return true;
 }

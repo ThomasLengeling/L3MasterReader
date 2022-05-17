@@ -119,6 +119,8 @@ public:
 
     glm::vec2 getInputPersp(int index);
 
+    glm::vec2 getCamDim() { return mDim; }
+
 
 private:
     //input stream

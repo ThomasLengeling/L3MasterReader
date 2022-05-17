@@ -38,7 +38,8 @@ enum debugConfiguration {
     RELEASE = 4,
     DEBUG = 5,
     SINGLE_MODE = 6,
-    PERSPECTIVE_IMG = 7
+    PERSPECTIVE_IMG = 7,
+    CAMERA_CALIBRATION
 };
 
 
@@ -109,7 +110,7 @@ public:
     
 
     // aruco detector
-    std::vector < ArucoDetectorRef> mArucoDetector;
+    ArucoDetectorRef  mArucoDetector;
     int mMaxMarkers;
     bool mRefimentAruco;
     bool mEnableCrop;

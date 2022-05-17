@@ -36,7 +36,7 @@ void ofApp::setup()
 
     setupArucoDetector();
     setupGridDetector();
-    setupCamCalibration();
+   
     setupCams();
     setupUDPConnection();
 
@@ -94,6 +94,7 @@ void ofApp::update()
            // }
             //cv::Mat copMat = mCamGrabber.at(currentId)->getCropMat();
 
+            //input.copyTo(copyColor);
 
             if (mConfigureMode == DEBUG_COLOR || mEnableColorPros) {
                 copMat.copyTo(copyColor);
@@ -107,23 +108,23 @@ void ofApp::update()
                 copyColor.copyTo(imageCopy);
             }
             else {
-                copMat.copyTo(imageCopy);
+                //copMat.copyTo(imageCopy);
             }
             if (!imageCopy.empty()) {
 
-                mArucoDetector.at(currentId)->detectMarkers(imageCopy, mRefimentAruco);
+                mArucoDetector->detectMarkers(imageCopy, mRefimentAruco);
 
                 // calculate the number of total markers
-                mMaxMarkers = mArucoDetector.at(currentId)->getNumMarkers();
+                mMaxMarkers = mArucoDetector->getNumMarkers();
 
                 // get the marker image output
-                mImageDetector = mArucoDetector.at(currentId)->getOfImg();
+                mImageDetector = mArucoDetector->getOfImg();
                 //vidMat = mArucoDetector.at(currentId)->getMatImg();
 
                 mCamGrabber.at(currentId)->updateDetectImg(mImageDetector);
 
                 // save the positions and id from the detected markers.
-                mGridDetector.at(currentId)->generateMarkers(mArucoDetector.at(currentId)->getTagIds(), mArucoDetector.at(currentId)->getBoard());
+                mGridDetector.at(currentId)->generateMarkers(mArucoDetector->getTagIds(), mArucoDetector->getBoard());
 
                 //update error check
                 mGridDetector.at(currentId)->updateProablity();
@@ -154,19 +155,19 @@ void ofApp::update()
 
                 if (!imageCopy.empty()) {
                     // detect the markers
-                    mArucoDetector.at(i)->detectMarkers(imageCopy, mRefimentAruco);
+                    mArucoDetector->detectMarkers(imageCopy, mRefimentAruco);
 
                     // calculate the number of total markers
-                    mMaxMarkers += mArucoDetector.at(i)->getNumMarkers();
+                    mMaxMarkers += mArucoDetector->getNumMarkers();
 
                     // get the marker image output
-                    mImageDetector = mArucoDetector.at(i)->getOfImg();
+                    mImageDetector = mArucoDetector->getOfImg();
                     //vidMat = mArucoDetector.at(i)->getMatImg();
 
                     cam->updateDetectImg(mImageDetector);
 
                     // save the positions and id from the detected markers.
-                    mGridDetector.at(i)->generateMarkers(mArucoDetector.at(i)->getTagIds(), mArucoDetector.at(i)->getBoard());
+                    mGridDetector.at(i)->generateMarkers(mArucoDetector->getTagIds(), mArucoDetector->getBoard());
 
                     //update errors
                     mGridDetector.at(i)->updateProablity();
@@ -200,16 +201,15 @@ void ofApp::updateUDP() {
         if (mGridDetector.at(mCurrentCamId)->isDoneCleaner()) {
             std::string udpMsg = "i ";
 
-            std::map<int, int> empthGrid = mGridDetector.at(mCurrentCamId)->getEmptyGrid();
+            //std::map<int, int> empthGrid = mGridDetector.at(mCurrentCamId)->getEmptyGrid();
 
             std::map<int, int> gridInter01 = mGridDetector.at(mCurrentCamId)->getGridInter();
 
             mPSGridArea = mSGridArea;
 
+            //update new pos
             mSGridArea.clear();
-
-            //area 1
-            mSGridArea.insert(empthGrid.begin(), empthGrid.end());
+            mSGridArea.insert(gridInter01.begin(), gridInter01.end());
 
             if (mPSGridArea != mSGridArea) {
                 std::string mUdpMsg = "i1 ";
@@ -307,6 +307,7 @@ void ofApp::offScreenMarkers() {
     ofRect(0, 0, ofGetWidth(), ofGetHeight());
 
     switch (mConfigureMode) {
+
     case INPUT_IMG:
         ofSetColor(255);
         mImageDetector.draw(0, 0);
@@ -317,9 +318,15 @@ void ofApp::offScreenMarkers() {
         mCamGrabber.at(mCurrentCamId)->drawCropImg();
         mCamGrabber.at(mCurrentCamId)->drawCropRoi();
         break;
+    case CAMERA_CALIBRATION:
+
+        ofSetColor(255);
+        mImageDetector.draw(0, 0);
+        break;
     case PERSPECTIVE_IMG:
 
         ofSetColor(255);
+        mImageDetector.draw(0, 0);
         mCamGrabber.at(mCurrentCamId)->drawCropImg();
         mCamGrabber.at(mCurrentCamId)->drawPerspectiveImg();
         
@@ -363,12 +370,14 @@ void ofApp::offScreenMarkers() {
 
         //draw squares
         glm::vec2 dim = mGridDetector.at(mCurrentCamId)->getDim();
+     
         int spaceX = dim.x * (sqsize + sqspace);
         int spaceY = dim.y * (sqsize + sqspace);
 
         int camWidth = mCamGrabber.at(mCurrentCamId)->getROI().width;
+        int prespWidth = mCamGrabber.at(mCurrentCamId)->getPerspecDim().x;
 
-        mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
+        mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(prespWidth + 30, 20, sqsize, sqspace);
     }
         break;
     case SINGLE_MODE:
@@ -472,6 +481,13 @@ void ofApp::draw()
   
     }
         break;
+    case CAMERA_CALIBRATION:
+        ofSetColor(255);
+        mFboSingle.draw(0, 0);
+
+        mArucoDetector->calibrateCameraProcess();
+        break;
+
     case INPUT_IMG:
     case PERSPECTIVE_IMG:
     case CUT_IMG:
@@ -521,6 +537,9 @@ void ofApp::draw()
     ofDrawBitmapStringHighlight("Max Markers: " + to_string(MAX_MARKERS), guiInfoX, guiInfoY + 15 * 3);
     ofDrawBitmapStringHighlight("Highlight Marker Id: " + ofToString(mHighlightMarkerId), guiInfoX, guiInfoY + 15 * 4);
 
+    ofDrawBitmapStringHighlight("Cam Res " + ofToString(mCamGrabber.at(mCurrentCamId)->getCamDim().x)+ " "+ ofToString(mCamGrabber.at(mCurrentCamId)->getCamDim().y), guiInfoX, guiInfoY + 15 * 5);
+
+    ofDrawBitmapStringHighlight("Cam Calibration Img: "+ofToString(mArucoDetector->getCalibrationCount()), guiInfoX, guiInfoY + 15 * 6);
 
     if (!mBSingleGrid->isActive()) {
         int i = 0;
@@ -643,7 +662,7 @@ void ofApp::keyReleased(int key)
         break;
 
     case 'a':
-        mArucoDetector.at(mCurrentCamId)->toggleMarkerInfo();
+        mArucoDetector->toggleMarkerInfo();
         break;
 
     case 't':
@@ -701,6 +720,13 @@ void ofApp::keyReleased(int key)
         break;
 
     case 'u':
+        setupCamCalibration();
+        break;
+    case 'y':
+        mArucoDetector->captureCalibrate();
+        break;
+    case 'h':
+        mArucoDetector->loadCalibration();
         break;
 
     case 'z':
@@ -717,9 +743,9 @@ void ofApp::keyReleased(int key)
         break;
 
     case 'g':
-        for (auto& aruco : mArucoDetector) {
-            aruco->generateDetectorParams();
-        }
+        
+        mArucoDetector->generateDetectorParams();
+        
         break;
 
     case 'p':
