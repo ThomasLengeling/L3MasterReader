@@ -263,12 +263,6 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
                 ofSetColor(255, 215, 13);
             }
 
-            if (mk->getInteractiveId() == 236 || 
-                mk->getInteractiveId() == 237 || 
-                mk->getInteractiveId() == 259 ||
-                mk->getInteractiveId() == 260) {
-                ofSetColor(0);
-            }
             float x = i * squareSize + i * squareSpace + posx;
             float y = j * squareSize + j * squareSpace + posy;
             ofDrawRectangle(glm::vec2(x, y), squareSize, squareSize);
@@ -294,16 +288,7 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
                 ofSetColor(255, 215, 13);
             }
 
-            if (mk->getInteractiveId() == 194 ||
-                mk->getInteractiveId() == 195 ||
-                mk->getInteractiveId() == 217 ||
-                mk->getInteractiveId() == 218 || 
-                mk->getInteractiveId() == 240 ||
-                mk->getInteractiveId() == 241 ||
-                mk->getInteractiveId() == 244 ||
-                mk->getInteractiveId() == 245 ||
-                mk->getInteractiveId() == 267 ||
-                mk->getInteractiveId() == 268 ||
+            if (
 
                 mk->getInteractiveId() == 37 ||
                 mk->getInteractiveId() == 38 ||
