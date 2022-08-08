@@ -27,9 +27,9 @@ void ofApp::setupValues() {
 
     mEnableColorPros = true;
 
-    mGridArea.resize(4);
+    mGridArea.resize(NUM_CAM_INPUTS);
     
-    if (mBaseGrid.load("imgs/grid_map_hd.png")) {
+    if (mBaseGrid.load("imgs/grid_map_hd_complete.png")) {
         ofLog(OF_LOG_NOTICE) << "Loaded Base Interactive Img";
     }
     else {
@@ -175,7 +175,7 @@ void ofApp::setupGUI() {
 
 
     mBGridSelect = ofxDatMatrix::create();
-    mBGridSelect->matrix = new ofxDatGuiMatrix("Grid Matrix", 2 * 2, true);
+    mBGridSelect->matrix = new ofxDatGuiMatrix("Grid Matrix", 2 * 3, true);
     mBGridSelect->matrix->setRadioMode(true);
     mBGridSelect->matrix->setOpacity(0.8);
     mBGridSelect->matrix->setWidth(390, .5);

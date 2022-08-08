@@ -224,7 +224,7 @@ void ofApp::updateUDP() {
             mPrevGridArea = mGridArea;
 
             mGridArea.clear();
-            mGridArea.resize(4);
+            mGridArea.resize(NUM_CAM_INPUTS);
 
             //area 1
             mGridArea.at(0).insert(empthGrid.begin(), empthGrid.end());
@@ -325,22 +325,34 @@ void ofApp::offScreenMarkers() {
         //cut RIO
         int camWidth = mCamGrabber.at(mCurrentCamId)->getROI().width;
 
-        mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
+        //mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
 
         ofSetColor(255);
-        ofDrawRectangle(0, 1080 - 850, 1920, 1080 * 0.65);
+        ofDrawRectangle(0, 1080 - 870, 1920, 1080 * 0.65);
+
+        ofSetColor(0);
+        ofDrawRectangle(0, 0, 1920, 120);
 
         ofSetColor(255);
         ofPushMatrix();
         //mBaseGrid.draw(200, 1080 - 950, 1920 * 0.9, 1080 * 0.9);
-        mBaseGrid.draw(0, 0, 1920, 1080);
+        
+        mBaseGrid.draw(50, 120, 1920, 1080);
         ofPopMatrix();
 
+        //black rectangle to hide cams
+        ofSetColor(0);
+        ofDrawRectangle(0, 0, 1920, 240);
         
 
         int j = 0;
         glm::vec2 pos;
-        std::vector<glm::vec2> gridPos = {glm::vec2(758, 144), glm::vec2(639, 373), glm::vec2(910, 348) , glm::vec2(1505, 320) };
+        std::vector<glm::vec2> gridPos = {glm::vec2(965 + 50 , 159 + 120), 
+                                          glm::vec2(1373 + 50, 158 + 120), 
+                                          glm::vec2(760 + 50, 363 + 120),
+                                          glm::vec2(1190 + 50, 363 + 120),
+                                          glm::vec2(800 + 50, 549 + 120),
+                                          glm::vec2(1190 + 50, 590 + 120) };
         for (auto& grid : mGridDetector) {
             pos = gridPos[j];
             grid->drawDetectedInteraction(j, pos.x, pos.y, sqsize, sqspace);
@@ -363,7 +375,8 @@ void ofApp::offScreenMarkers() {
                 else {
                     ofSetColor(255);
                 }
-                gridImage->drawImage(480 * index, 0, 480, 270);
+                int imageW = 1920 / (float)mCamGrabber.size();
+                gridImage->drawImage((imageW) * index, 0, imageW, 270);
                 index++;
             }
         }
@@ -416,9 +429,9 @@ void ofApp::draw()
 
 
 
-
+        //draw bottom rect for drawing GUI
         ofSetColor(225);
-        ofDrawRectangle(0, 1080 - 230, 1920, 1080);
+        ofDrawRectangle(0, 1080 - 145, 1920, 1080);
         break;
 
     }
@@ -451,11 +464,17 @@ void ofApp::draw()
             i++;
         }
     }
-    ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1750, 950);
+    ofDrawBitmapStringHighlight("L3 Cities 2022 ", 1750, 850);
 
 
     
   // ofDrawBitmapStringHighlight("cam fps: " + ofToString(grabber.getGrabber(, 0), 20, ofGetHeight() - 40);
+}
+
+void ofApp::mouseMoved(int x, int y) {
+    posgrid.x = x;
+    posgrid.y = y;
+    cout << posgrid.x << " " << posgrid.y << std::endl;
 }
 
 void ofApp::mousePressed(int x, int y, int button) {

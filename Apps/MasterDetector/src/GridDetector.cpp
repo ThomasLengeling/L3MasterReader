@@ -118,8 +118,8 @@ void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, in
     mMarkers.clear();
     int indeY = 0;
     int indeX = 0;
-    ofLog(OF_LOG_NOTICE) << "Max Markers: " << mMaxMarkers;
-    for (int i = 0; i < gridPos[mId].size(); i++) {
+    ofLog(OF_LOG_NOTICE) << "Max Markers: " << mMaxMarkers; //gridPos[mId].size()
+    for (int i = 0; i < mMaxMarkers; i++) {
         TangibleMarkerRef m = TangibleMarker::create();
 
         float x = indeX * stepX + startGridX;
@@ -127,8 +127,8 @@ void GridDetector::generateGridPos(int startGridX, int startGridY, int stepX, in
 
         m->setPos(glm::vec2(x, y));
         m->setGridId(i);  //
-
-        m->setInteractiveId(gridPos[mId].at(i));
+        m->setInteractiveId(i);
+       // m->setInteractiveId(gridPos[mId].at(i));
         m->setMarkerId(-1);
         mMarkers.push_back(m);
         indeX++;
@@ -321,14 +321,6 @@ void GridDetector::drawDetectedInteraction(int id, float posx, float posy, float
         else {
             ofSetColor(255, 215, 13);
         }
-        /*
-        if (id == 0) {
-            if (mk->getInteractiveId() == 194 ||
-                mk->getInteractiveId() == 195) {
-                ofSetColor(0);
-            }
-        }
-        */
 
         float x = i * squareSpace + posx;
         float y = j * squareSpace + posy;

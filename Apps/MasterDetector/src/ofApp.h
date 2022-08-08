@@ -19,7 +19,7 @@
 #include <utility>
 
 
-#define NUM_CAM_INPUTS 4
+#define NUM_CAM_INPUTS 6
 
 #define CAM_WIDTH  1920  //1920
 #define CAM_HEIGHT 1080 //1080
@@ -54,6 +54,7 @@ public:
     void mouseDragged(int x, int y, int button);
     void mouseReleased(int x, int y, int button);
     void mousePressed(int x, int y, int button);
+    void mouseMoved(int x, int y);
     void keyPressed(int key);
     void keyReleased(int key);
 
@@ -120,6 +121,8 @@ public:
     std::vector<glm::vec2> mGridSizes;
 
     //grid calculations
+
+    glm::vec2 posgrid;
 
     int numMarkers;
 
