@@ -103,6 +103,8 @@ public:
 
     void drawRotation();
 
+    void setWindowIter(int value) {mWindowIterMax = value;}
+
     std::map<int, int> getGridInter() {
         return mGridIdPair;
     }

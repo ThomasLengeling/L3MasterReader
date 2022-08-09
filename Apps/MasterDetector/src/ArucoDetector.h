@@ -60,6 +60,7 @@ public:
     void calibrateCamera();
 
     void generateDetectorParams();
+    void generateDetectorParams(std::string file);
 
     //calibration
     bool readDetectorParameters(std::string filename, cv::Ptr< cv::aruco::DetectorParameters> & params);

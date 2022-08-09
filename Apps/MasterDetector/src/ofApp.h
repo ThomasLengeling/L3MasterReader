@@ -26,7 +26,7 @@
 
 #define CAM_FRAMERATE 5 //10
 
-#define MAX_MARKERS  267
+#define MAX_MARKERS  942
 
 
 
@@ -135,6 +135,7 @@ public:
     ofxDatButtonRef mBSingleGrid;
     ofxDatButtonRef mBFullGrid;
     ofxDatButtonRef mCamCalibration;
+    ofxDatButtonRef mAccurancy;
     ofxDatMatrixRef mBGridSelect;
 
     bool mEnableColorPros;

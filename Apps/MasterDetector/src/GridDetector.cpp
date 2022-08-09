@@ -159,7 +159,7 @@ void GridDetector::setupCleaner() {
 
   // cleaner
   mWindowCounter = 0;
-  mWindowIterMax = 12; ///
+  mWindowIterMax = 1; ///12
   mCleanDone = false;
 
   for (int i = 0; i < mMaxMarkers; i++) {

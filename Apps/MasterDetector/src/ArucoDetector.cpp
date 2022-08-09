@@ -18,8 +18,12 @@ void ArucoDetector::resetMinMax() {
 }
 
 void ArucoDetector::generateDetectorParams() {
-    ofLog(OF_LOG_NOTICE) << "Loading Dectector Params: ";
-    ofFile file("camera_config.json");
+    generateDetectorParams("camera_config.json");
+}
+
+void ArucoDetector::generateDetectorParams(std::string sfile) {
+    ofLog(OF_LOG_NOTICE) << "Loading Dectector Params: "<< sfile;
+    ofFile file(sfile);
     if (file.exists()) {
         ofJson  jsParams;
         file >> jsParams;
@@ -52,7 +56,7 @@ void ArucoDetector::generateDetectorParams() {
 
 
 
-        int dictionaryId = cv::aruco::DICT_4X4_250; //0
+        int dictionaryId = cv::aruco::DICT_4X4_50; //0
         detectorParams = cv::aruco::DetectorParameters::create();
 
         detectorParams->adaptiveThreshConstant = adaptiveThreshConstant;
@@ -102,7 +106,7 @@ https://docs.opencv.org/4.5.5/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.htm
 void ArucoDetector::setupCalibration(int markersX, int markersY) {
   float markerLength     = 0.0162;     // 0.0165
   float markerSeparation = 0.0042; // 0045
-  int dictionaryId       = cv::aruco::DICT_4X4_250; //0
+  int dictionaryId       = cv::aruco::DICT_4X4_50; //0
   std::string outputFile = "./cal.txt";
 
   int calibrationFlags = 0;

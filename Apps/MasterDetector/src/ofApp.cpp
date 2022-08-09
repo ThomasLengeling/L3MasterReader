@@ -163,7 +163,8 @@ void ofApp::update()
     }
 
 
-    updateUDP();
+
+    updateGUI();
 
     offScreenMarkers();
 
@@ -173,7 +174,7 @@ void ofApp::update()
         mCalculateGrid = false;
     }
 
-    updateGUI();
+
 }
 //--------------------------------------------------------------------------- 
 void ofApp::updateUDP() {
@@ -201,11 +202,12 @@ void ofApp::updateUDP() {
                 doneClean++;
             }
         }
-
+       
         //ofLog(OF_LOG_NOTICE) << "D: " << doneClean << std::endl;
         
         // send UDP in the correct format.
         if (doneClean == 4) {
+            /*
             std::string compandStr;
             compandStr += "i ";
 
@@ -256,6 +258,7 @@ void ofApp::updateUDP() {
                     //ofLog(OF_LOG_NOTICE) << "Msg: " << mUdpMsg;
                 }
             }
+            */
 
             for (auto& gridDetector : mGridDetector) {
                 gridDetector->resetProbabilty();
@@ -688,6 +691,7 @@ void ofApp::drawGUI() {
     case DEBUG:
     case RELEASE:
     case INPUT_IMG:
+        mAccurancy->draw();
         mBSingleGrid->draw();
         mBFullGrid->draw();
         mCamCalibration->draw();
@@ -708,12 +712,25 @@ void ofApp::updateGUI() {
     case DEBUG:
     case RELEASE:
     case INPUT_IMG:
+        mAccurancy->update();
         mBSingleGrid->update();
         mBFullGrid->update();
         mCamCalibration->update();
         mBGridSelect->update();
         mCamCalibration->update();
         break;
+    }
+
+    if (mAccurancy->isActive()) {
+        for (auto& grid : mGridDetector) {
+            grid->setWindowIter(12);
+        }
+        updateUDP();
+    }
+    else {
+        for (auto& grid : mGridDetector) {
+            grid->setWindowIter(2);
+        }
     }
 }
 

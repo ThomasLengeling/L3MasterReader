@@ -137,6 +137,22 @@ void ofApp::setupGUI() {
     int sliderStartX =  250;
     int sliderStartY = ofGetWindowHeight() - 200;
 
+   
+    mAccurancy = ofxDatButton::create();
+    mAccurancy->button = new ofxDatGuiToggle("Accurancy", true);
+    mAccurancy->setActivation(true);
+    mAccurancy->button->setPosition(sliderStartX, sliderStartY-30);
+    mAccurancy->button->setWidth(100, .5);
+    mAccurancy->button->onButtonEvent([&](ofxDatGuiButtonEvent v) {
+        mAccurancy->toggle();
+        if (mAccurancy->isActive()) {
+            std::cout << "accurancy";
+        }
+        if(!mAccurancy->isActive()) {
+            std::cout << "non accurancy";
+        }
+        });
+
     mBSingleGrid = ofxDatButton::create();
     mBSingleGrid->button = new ofxDatGuiToggle("Single Input", false);
     mBSingleGrid->setActivation(false);
