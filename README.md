@@ -1,5 +1,7 @@
 # L3MasterReader
 
+The MasterReader program is a C++ application that was designed to recognize and analyze physical grid cells of the Cityscope platform. The application takes advantage of openCV to accomplish the detection of Aruco tags in real time. The data is compressed into a string before being sent via the UDP protocol to a host, either remotely or locally.
+
 Checkout Branch Simple for single use camera input
 
 ### Keys
@@ -43,6 +45,7 @@ Checkout Branch Simple for single use camera input
 ]
 ```
 - gridpos_00 Dots positions
+
 - griddef.json Grid definition
 
 Update the x and y values to correspond the dected grid area
