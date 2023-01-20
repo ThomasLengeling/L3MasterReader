@@ -105,6 +105,12 @@ public:
     //get cornes for transformation
     void updateCorners(glm::vec2 corner);
 
+    void updateCurrCorner(glm::vec2 pos);
+
+    int getPerspectiveId() { return cornerIndex; }
+
+    void incPerspectiveId();
+
     bool isEnablePerspective() { return mCalculatedPerspec; }
     void enablePerspective() { mCalculatedPerspec = true; }
 
@@ -118,7 +124,8 @@ public:
     void addInputPersp(glm::vec2 pos, int index);
 
     glm::vec2 getInputPersp(int index);
-
+    glm::vec2 getCurrPerspPos() { return glm::vec2(mInputQuad[cornerIndex].x, mInputQuad[cornerIndex].y); }
+   
     glm::vec2 getCamDim() { return mDim; }
 
 

@@ -241,11 +241,29 @@ void CamCapture::drawPerspectiveImg() {
 }
 
 //-----------------------------------------------------------------------------
+void CamCapture::updateCurrCorner(glm::vec2 corner) {
+    //Input Quadilateral or Image plane coordinates
+    mInputQuad[cornerIndex] = cv::Point2f(corner.x, corner.y);
+    ofLog(OF_LOG_NOTICE) << "added point " << cornerIndex << " " << corner.x << ", " << corner.y << std::endl;
+    ofLog(OF_LOG_NOTICE) << "new calculated perspective done";
+        mCalculatedPerspec = true;
+}
+//-----------------------------------------------------------------------------
 void CamCapture::updateCorners(glm::vec2 corner) {
     //Input Quadilateral or Image plane coordinates
     mInputQuad[cornerIndex] = cv::Point2f(corner.x, corner.y);
     ofLog(OF_LOG_NOTICE) << "added point " << cornerIndex << " " << corner.x << ", " << corner.y << std::endl;
 
+    cornerIndex++;
+    if (cornerIndex >= 4) {
+        cornerIndex = 0;
+        ofLog(OF_LOG_NOTICE) << "new calculated perspective done";
+        mCalculatedPerspec = true;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void CamCapture::incPerspectiveId() {
     cornerIndex++;
     if (cornerIndex >= 4) {
         cornerIndex = 0;

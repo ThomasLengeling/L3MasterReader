@@ -324,19 +324,19 @@ void ofApp::offScreenMarkers() {
         mImageDetector.draw(0, 0);
         break;
     case PERSPECTIVE_IMG:
-
+    {
         ofSetColor(255);
         mImageDetector.draw(0, 0);
         mCamGrabber.at(mCurrentCamId)->drawCropImg();
         mCamGrabber.at(mCurrentCamId)->drawPerspectiveImg();
-        
+
 
 
         ofSetColor(0, 200, 255, 150);
-        ofDrawCircle(mMousePos.x, mMousePos.y, 20);
+        ofDrawCircle(mMousePos.x, mMousePos.y, 15);
 
-        ofSetColor(0, 220, 225, 255);
-        ofDrawCircle(mCurretPerspInc.x, mCurretPerspInc.y, 20);
+        ofSetColor(0, 220, 225, 200);
+        ofDrawCircle(mCurretPerspInc.x, mCurretPerspInc.y, 15);
 
         for (int i = 0; i < 4; i++) {
             auto perspecPoint = mCamGrabber.at(mCurrentCamId)->getInputPersp(i);
@@ -344,11 +344,15 @@ void ofApp::offScreenMarkers() {
             ofSetColor(100, 120, 225, 200);
             ofDrawCircle(perspecPoint.x, perspecPoint.y, 15, 15);
             ofSetColor(255);
-            ofDrawBitmapStringHighlight("P: " + ofToString(perspecPoint.x)+ " "+ofToString(perspecPoint.y), perspecPoint.x, perspecPoint.y);
+            ofDrawBitmapStringHighlight("P " + ofToString(i) + ": " + ofToString(perspecPoint.x) + " " + ofToString(perspecPoint.y), perspecPoint.x+ 5, perspecPoint.y);
 
         }
-        break;
 
+        ofSetColor(0, 210, 200, 255);
+        glm::vec2 pos = mCamGrabber.at(mCurrentCamId)->getCurrPerspPos();
+        ofDrawCircle(pos.x, pos.y, 20);
+    }
+        break;
     case DEBUG_COLOR:
     {
         ofSetColor(255);
@@ -398,7 +402,7 @@ void ofApp::offScreenMarkers() {
 
         //mGridDetector.at(mCurrentCamId)->drawDetectedGridIn(camWidth + 30, 20, sqsize, sqspace);
 
-        //mBaseGrid.draw(0, 0);
+        mBaseGrid.draw(0, 0);
         glm::vec2 pos(500, 280);
         mGridDetector.at(mCurrentCamId)->drawDetectedInteraction(0, pos.x, pos.y, sqsize, sqspace);
 
@@ -568,6 +572,8 @@ void ofApp::mousePressed(int x, int y, int button) {
             mHighlightMarkerId++;
         }
     }
+
+ 
 }
 
 //--------------------------------------------------------------
@@ -595,19 +601,22 @@ void ofApp::mouseDragged(int x, int y, int button) {
     if (mConfigureMode == PERSPECTIVE_IMG) {
         //mGridDetector.at(mCurrentCamId)->setGridPos(glm::vec2(x, y));
     }
+
+    if (mConfigureMode == PERSPECTIVE_IMG && ofGetKeyPressed(OF_KEY_SHIFT)) {
+        mMousePos.x = x;
+        mMousePos.y = y;
+        mCamGrabber.at(mCurrentCamId)->updateCurrCorner(glm::vec2(x, y));
+    }
 }
 //--------------------------------------------------------------
 
 void  ofApp::mouseMoved(int x, int y) {
-    if (mConfigureMode == PERSPECTIVE_IMG) {
-        mMousePos.x = x;
-        mMousePos.y = y;
-    }
+
 }
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button) {
 
-    if (mConfigureMode == PERSPECTIVE_IMG) {
+    if (mConfigureMode == PERSPECTIVE_IMG && ofGetKeyPressed(OF_KEY_SHIFT)) {
         mCamGrabber.at(mCurrentCamId)->updateCorners(glm::vec2(x, y));
     }
 }
@@ -774,47 +783,55 @@ void ofApp::keyPressed(int key) {
     //Perspective
     if (key == 'l') {
         if (mCamGrabber.at(mCurrentCamId)->isEnablePerspective()) {
-            mPerspectiveIndex++;
-            if (mPerspectiveIndex >= 4) {
-                mPerspectiveIndex = 0;
-            }
-            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(mPerspectiveIndex);
-            ofLog(OF_LOG_NOTICE) << "Perspective Index " << mPerspectiveIndex;
+            mCamGrabber.at(mCurrentCamId)->incPerspectiveId();
+            int currPerspId = mCamGrabber.at(mCurrentCamId)->getPerspectiveId();
+            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(currPerspId);
+            ofLog(OF_LOG_NOTICE) << "Perspective Index " << currPerspId;
         }
     }
 
     if (key == OF_KEY_UP) {
         if ( mCamGrabber.at(mCurrentCamId)->isEnablePerspective()) {
             mPerspInc = glm::vec2(0.0, 0.5);
-            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, mPerspectiveIndex);
-            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(mPerspectiveIndex);
 
-            ofLog(OF_LOG_NOTICE) << "Perspective UP " << mPerspectiveIndex;
+            int currPerspId = mCamGrabber.at(mCurrentCamId)->getPerspectiveId();
+            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, currPerspId);
+            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(currPerspId);
+
+            ofLog(OF_LOG_NOTICE) << "Perspective UP " << currPerspId;
         }
     }
     if (key == OF_KEY_DOWN) {
         if (mCamGrabber.at(mCurrentCamId)->isEnablePerspective()) {
             mPerspInc = glm::vec2(0.0, -0.5);
-            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, mPerspectiveIndex);
-            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(mPerspectiveIndex);
 
-            ofLog(OF_LOG_NOTICE) << "Perspective DOWN " << mPerspectiveIndex;
+            int currPerspId = mCamGrabber.at(mCurrentCamId)->getPerspectiveId();
+            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, currPerspId);
+            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(currPerspId);
+
+            ofLog(OF_LOG_NOTICE) << "Perspective DOWN " << currPerspId;
         }
     }
     if (key == OF_KEY_RIGHT) {
         if (mCamGrabber.at(mCurrentCamId)->isEnablePerspective()) {
             mPerspInc = glm::vec2(0.5, 0.0);
-            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, mPerspectiveIndex);
-            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(mPerspectiveIndex);
 
-            ofLog(OF_LOG_NOTICE) << "Perspective UP " << mPerspectiveIndex;
+            int currPerspId = mCamGrabber.at(mCurrentCamId)->getPerspectiveId();
+            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, currPerspId);
+            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(currPerspId);
+
+            ofLog(OF_LOG_NOTICE) << "Perspective RIGHT " << currPerspId;
         }
     }
     if (key == OF_KEY_LEFT) {
         if (mCamGrabber.at(mCurrentCamId)->isEnablePerspective()) {
             mPerspInc = glm::vec2(-0.5, 0.0);
-            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, mPerspectiveIndex);
-            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(mPerspectiveIndex);
+
+            int currPerspId = mCamGrabber.at(mCurrentCamId)->getPerspectiveId();
+            mCamGrabber.at(mCurrentCamId)->addInputPersp(mPerspInc, currPerspId);
+            mCurretPerspInc = mCamGrabber.at(mCurrentCamId)->getInputPersp(currPerspId);
+
+            ofLog(OF_LOG_NOTICE) << "Perspective LEFT " << currPerspId;
         }
     }
 
@@ -873,11 +890,11 @@ void ofApp::drawGUI() {
     case RELEASE:
     case SINGLE_MODE:
     case INPUT_IMG:
-        mBSingleGrid->draw();
-        mBFullGrid->draw();
-        mCamCalibration->draw();
-        mBGridSelect->draw();
-        mCamCalibration->draw();
+       // mBSingleGrid->draw();
+       // mBFullGrid->draw();
+      //  mCamCalibration->draw();
+      //  mBGridSelect->draw();
+      //  mCamCalibration->draw();
         break;
     }
 }
@@ -894,11 +911,11 @@ void ofApp::updateGUI() {
     case RELEASE:
     case SINGLE_MODE:
     case INPUT_IMG:
-        mBSingleGrid->update();
-        mBFullGrid->update();
-        mCamCalibration->update();
-        mBGridSelect->update();
-        mCamCalibration->update();
+       // mBSingleGrid->update();
+       // mBFullGrid->update();
+      //  mCamCalibration->update();
+      //  mBGridSelect->update();
+      //  mCamCalibration->update();
         break;
     }
 }

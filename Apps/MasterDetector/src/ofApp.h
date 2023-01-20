@@ -19,14 +19,13 @@
 #include <utility>
 
 
-#define NUM_CAM_INPUTS 4
+#define NUM_CAM_INPUTS 1
 
 #define CAM_WIDTH  1920  //1920
 #define CAM_HEIGHT 1080 //1080
 
-#define CAM_FRAMERATE 5 //10
+#define CAM_FRAMERATE 15 //10
 
-#define MAX_MARKERS  267
 
 
 

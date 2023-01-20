@@ -29,7 +29,7 @@ void ofApp::setupValues() {
 
     mGridArea.resize(4);
     
-    if (mBaseGrid.load("imgs/01202022_baseinteraction_bw.png")) {
+    if (mBaseGrid.load("imgs/base_img.png")) {
         ofLog(OF_LOG_NOTICE) << "Loaded Base Interactive Img";
     }
     else {
@@ -138,23 +138,23 @@ void ofApp::setupUDPConnection() {
 
 //-----------------------------------------------------------------------------
 void ofApp::setupGUI() {
-    int sliderStartX =  250;
-    int sliderStartY = ofGetWindowHeight() - 200;
+    int sliderStartX =  120;
+    int sliderStartY = ofGetWindowHeight() - 300;
 
     mBSingleGrid = ofxDatButton::create();
     mBSingleGrid->button = new ofxDatGuiToggle("Single Input", false);
-    mBSingleGrid->setActivation(false);
+    mBSingleGrid->setActivation(true);
     mBSingleGrid->button->setPosition(sliderStartX, sliderStartY);
-    mBSingleGrid->button->setWidth(100, .5);
+    mBSingleGrid->button->setWidth(200, .5);
     mBSingleGrid->button->onButtonEvent([&](ofxDatGuiButtonEvent v) {
         mBSingleGrid->toggle();
         });
 
     mBFullGrid = ofxDatButton::create();
     mBFullGrid->button = new ofxDatGuiToggle("Full Input", true);
-    mBFullGrid->setActivation(true);
-    mBFullGrid->button->setPosition(sliderStartX, sliderStartY + 30);
-    mBFullGrid->button->setWidth(100, .5);
+    mBFullGrid->setActivation(false);
+    mBFullGrid->button->setPosition(sliderStartX, sliderStartY + 60);
+    mBFullGrid->button->setWidth(200, .5);
     mBFullGrid->button->onButtonEvent([&](ofxDatGuiButtonEvent v) {
         mBFullGrid->toggle();
 
@@ -171,8 +171,8 @@ void ofApp::setupGUI() {
     mCamCalibration = ofxDatButton::create();
     mCamCalibration->setActivation(false);
     mCamCalibration->button = new ofxDatGuiToggle("Cameras");
-    mCamCalibration->button->setPosition(sliderStartX, sliderStartY + 60);
-    mCamCalibration->button->setWidth(100, .5);
+    mCamCalibration->button->setPosition(sliderStartX, sliderStartY + 120);
+    mCamCalibration->button->setWidth(200, .5);
     mCamCalibration->button->onButtonEvent([&](ofxDatGuiButtonEvent v) {
         mCamCalibration->toggle();
         });
@@ -183,7 +183,7 @@ void ofApp::setupGUI() {
     mBGridSelect->matrix->setRadioMode(true);
     mBGridSelect->matrix->setOpacity(0.8);
     mBGridSelect->matrix->setWidth(390, .5);
-    mBGridSelect->matrix->setPosition(sliderStartX, sliderStartY + 90);
+    mBGridSelect->matrix->setPosition(sliderStartX, sliderStartY + 180);
     mBGridSelect->matrix->onMatrixEvent([&](ofxDatGuiMatrixEvent v) {
         mCurrentCamId = v.child;
         mHighlightMarkerId = 0;
@@ -200,7 +200,7 @@ void ofApp::setupGUI() {
     mGammaValue->slider =
         new ofxDatGuiSlider(mGammaValue->ofParam.set("gamma", 0.65, 0.0, 3.0));
     mGammaValue->slider->setWidth(390, .5);
-    mGammaValue->slider->setPosition(sliderStartX + 30, sliderStartY + 30);
+    mGammaValue->slider->setPosition(sliderStartX + 30, sliderStartY);
     mGammaValue->slider->onSliderEvent(
         [&](ofxDatGuiSliderEvent v) { mGammaValue->ofParam = v.value; });
 
@@ -218,7 +218,7 @@ void ofApp::setupGUI() {
     mBetaValue->slider =
         new ofxDatGuiSlider(mBetaValue->ofParam.set("beta", 50, 0.0, 100.0));
     mBetaValue->slider->setWidth(390, .5);
-    mBetaValue->slider->setPosition(sliderStartX + 30, sliderStartY + 90);
+    mBetaValue->slider->setPosition(sliderStartX + 30, sliderStartY + 120);
     mBetaValue->slider->onSliderEvent(
         [&](ofxDatGuiSliderEvent v) { mBetaValue->ofParam = v.value; });
 
@@ -281,16 +281,27 @@ void ofApp::setupCams() {
                     float beta  = cam[inputImg]["beta"].get<float>();
 
                     //perspective
-                    glm::vec2 inputQuad0 = glm::vec2(cam[inputImg]["px0"], cam[inputImg]["py0"]);
-                    glm::vec2 inputQuad1 = glm::vec2(cam[inputImg]["px1"], cam[inputImg]["py1"]);
-                    glm::vec2 inputQuad2 = glm::vec2(cam[inputImg]["px2"], cam[inputImg]["py2"]);
-                    glm::vec2 inputQuad3 = glm::vec2(cam[inputImg]["px3"], cam[inputImg]["py3"]);
+                    if (cam[inputImg]["px0"].is_number_float() && cam[inputImg]["py0"].is_number_float()) {
+                        glm::vec2 inputQuad0 = glm::vec2(cam[inputImg]["px0"], cam[inputImg]["py0"]);
+                        mCamGrabber.at(j)->setInputPersp(inputQuad0, 0);
+                    }
 
-                    mCamGrabber.at(j)->setInputPersp(inputQuad0, 0);
-                    mCamGrabber.at(j)->setInputPersp(inputQuad1, 1);
-                    mCamGrabber.at(j)->setInputPersp(inputQuad2, 2);
-                    mCamGrabber.at(j)->setInputPersp(inputQuad3, 3);
+                    if (cam[inputImg]["px1"].is_number_float() && cam[inputImg]["py1"].is_number_float()) {
+                        glm::vec2 inputQuad1 = glm::vec2(cam[inputImg]["px1"], cam[inputImg]["py1"]);
+                        mCamGrabber.at(j)->setInputPersp(inputQuad1, 1);
+                    }
 
+                    if (cam[inputImg]["px2"].is_number_float() && cam[inputImg]["py2"].is_number_float()) {
+                        glm::vec2 inputQuad2 = glm::vec2(cam[inputImg]["px2"], cam[inputImg]["py2"]);
+                        mCamGrabber.at(j)->setInputPersp(inputQuad2, 2);
+                    }
+
+                    if (cam[inputImg]["px3"].is_number_float() && cam[inputImg]["py3"].is_number_float()) {
+                        glm::vec2 inputQuad3 = glm::vec2(cam[inputImg]["px3"], cam[inputImg]["py3"]);
+                        mCamGrabber.at(j)->setInputPersp(inputQuad3, 3);
+                    }
+
+               
                     //mCamGrabber.at(j)->resetPerspective();
                     mCamGrabber.at(j)->enablePerspective();
                     
