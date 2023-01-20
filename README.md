@@ -25,9 +25,23 @@ Checkout Branch Simple for single use camera input
 ### Files:
 
 - img.json Camera information
-          - Upadate the 'camId' to correspond the 'id' of the input camera
-
-
+          - Upadate the ``camId`` to correspond the 'id' of the input camera
+```
+[
+  {
+    "cam0": {
+      "alpha": 0.6499999761581421,
+      "beta": 27.209999084472656,
+      "camId": 0,
+      "gamma": 1.2999999523162842,
+      "x1": 0,
+      "x2": 0,
+      "y1": 1920,
+      "y2": 1080
+    }
+  }
+]
+```
 - gridpos_00 Dots positions
 - griddef.json Grid definition
 
